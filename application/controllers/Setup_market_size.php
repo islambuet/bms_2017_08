@@ -218,7 +218,7 @@ class Setup_market_size extends Root_Controller
             }
         }
 
-        $this->db->select('ms.size_total,ms.size_arm,ms.date_created');
+        $this->db->select('ms.size_total,ms.size_arm,ms.date_created,ms.remarks');
         $this->db->join($this->config->item('table_bms_setup_market_size').' ms','ms.outlet_id = outlet.id and ms.revision = 1 and ms.crop_type_id ='.$item_id,'LEFT');
 
 
