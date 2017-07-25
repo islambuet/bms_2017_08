@@ -5,6 +5,7 @@ $lang['MSG_USERNAME_PASSWORD_INVALID'] = 'Username and Password did not match or
 $lang['MSG_LOGIN_SUCCESS'] = 'Successfully Logged In';
 $lang['MSG_LOGOUT_SUCCESS'] = 'Successfully Logged out';
 $lang['MSG_SITE_OFFLINE'] = 'Site is Currently Offline.Please contact with admin(01777709208).';
+$lang['MSG_LOCATION_NOT_ASSIGNED_OR_INVALID'] = 'No Location assigned.Please contact with admin(01777709208).';
 
 //Action buttons
 $lang['ACTION_DASHBOARD'] = 'Dashboard';
@@ -163,6 +164,7 @@ $lang['LABEL_CUSTOMER_TYPE'] = 'Customer Type';
 $lang['LABEL_PICTURE'] = 'Picture';
 $lang['LABEL_MAP_ADDRESS'] = 'Google Map Link';
 $lang['LABEL_INCHARGE'] = 'In-charge';
+$lang['LABEL_OUTLET_NAME'] = 'Outlet';
 
 // Office staff
 $lang['LABEL_NUMBER_OF_SUBORDINATE'] = 'Number Of Subordinate';

@@ -1,6 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-// Office Staff
-$config['table_tms_setup_subordinate_employee'] = 'arm_tms_2017_07.tms_setup_subordinate_employee';
-$config['table_tms_setup_coworker'] = 'arm_tms_2017_07.tms_setup_coworker';
+// Setup
+//Market Size
+$config['table_bms_setup_market_size'] = 'arm_bms_2017_08.bms_setup_market_size';
+

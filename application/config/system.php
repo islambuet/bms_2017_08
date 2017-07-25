@@ -9,4 +9,6 @@ $config['system_max_actions']=7;
 $config['system_status_active']='Active';
 $config['system_status_inactive']='In-Active';
 $config['system_status_delete']='Deleted';
-$config['system_image_base_url']='http://localhost/tms_2017_07/';
+$config['system_image_base_url']='http://localhost/tms_2017_07/';//depended on sites base url
+
+$config['system_customer_type_outlet_id']=1;//depended on sites base url
