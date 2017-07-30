@@ -2,7 +2,7 @@
 
 class Setup_market_size extends Root_Controller
 {
-    private  $message;
+    private $message;
     public $permissions;
     public $controller_url;
     public $locations;

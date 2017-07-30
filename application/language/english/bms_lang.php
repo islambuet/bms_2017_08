@@ -42,34 +42,45 @@ $lang['LABEL_ACTION6'] = 'Column Headers';
 
 $lang['TOTAL_TASK'] = 'Number of Tasks';
 $lang['LABEL_TYPE'] = 'Type';
-$lang['MSG_ROLE_ASSIGN_SUCCESS'] = 'Role Assign Successful.';
+
 //*****//
-
-//common
-$lang['YOU_DONT_HAVE_ACCESS'] = 'You cannot access this page';
-$lang['ACTIVE'] = 'Active';
-$lang['INACTIVE'] = 'In-active';
-$lang['DELETE'] = 'Delete';
-$lang['SELECT'] = 'Select';
-
-$lang['SERIAL'] = 'Serial';
-$lang['STATUS'] = 'Status';
-$lang['ACTION'] = 'Action';
-$lang['NO_DATA_FOUND']='No Data Found';
+//messages
 $lang['MSG_SAVED_SUCCESS'] = 'Successfully Saved';
 $lang['MSG_SAVED_FAIL'] = 'Failed to Save!';
 $lang['MSG_INVALID_INPUT'] = 'Invalid data entry';
+$lang['MSG_ROLE_ASSIGN_SUCCESS'] = 'Role Assign Successful.';
+$lang['YOU_DONT_HAVE_ACCESS'] = 'You cannot access this page';
+$lang['NO_DATA_FOUND']='No Data Found';
 
+//common
+$lang['ACTIVE'] = 'Active';
+$lang['INACTIVE'] = 'In-active';
+$lang['STATUS'] = 'Status';
+$lang['DELETE'] = 'Delete';
+$lang['SELECT'] = 'Select';
+
+$lang['LABEL_YES'] = 'Yes';
+$lang['LABEL_NO'] = 'No';
+
+$lang['LABEL_SL_NO'] = 'SL#';
+$lang['ACTION'] = 'Action';
+
+//dates
 $lang['LABEL_DATE']='Date';
 $lang['LABEL_DATE_CREATED']='Creation date';
 $lang['MSG_FILE_SIZE_ERROR']='File Size Error';
 $lang['MSG_FILE_TYPE_ERROR']='File Type Error';
 
-$lang['LABEL_YES'] = 'Yes';
-$lang['LABEL_NO'] = 'No';
 
 
+//years
 $lang['LABEL_YEAR'] = 'Year';
+$lang['LABEL_FISCAL_YEAR'] = 'Fiscal Year';
+$lang['LABEL_BUDGETED_YEAR'] = 'Budgeting Year';
+$lang['LABEL_NEXT_YEARS'] = 'Next Years';
+$lang['LABEL_PREVIOUS_YEARS'] = 'Previous Years';
+
+
 $lang['LABEL_NAME'] = 'Name';
 $lang['LABEL_EMAIL'] = 'Email Address';
 $lang['LABEL_ORDER'] = 'Ordering';
