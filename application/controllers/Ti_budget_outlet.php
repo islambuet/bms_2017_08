@@ -116,6 +116,12 @@ class Ti_budget_outlet extends Root_Controller
             $ajax['system_message']='Please Select a Outlet';
             $this->json_return($ajax);
         }
+        $this->db->from($this->config->item('table_bms_setup_market_size').' ms');
+        $this->db->select('ms.*');
+        $this->db->where('ms.revision',1);
+        $this->db->where('ms.outlet_id',$reports['outlet_id']);
+        $this->db->where('ms.crop_type_id',$reports['crop_type_id']);
+        $data['market_survey']=$this->db->get()->row_array();
         $data['title']='Outlet Budget';
         $data['years_previous']=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id <'.$reports['year_id']),$this->config->item('num_year_previous_sell'),0,array('id DESC'));
         $data['year_current']=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id ='.$reports['year_id']),1,0,array('id ASC'));
@@ -141,6 +147,21 @@ class Ti_budget_outlet extends Root_Controller
         $year_current=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id ='.$year_id),1,0,array('id ASC'));
         $years_next=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id >'.$year_id),$this->config->item('num_year_budget_prediction'),0,array('id ASC'));
         //TODO get sells from pos for previous years budget
+
+        //getting previous year data
+        $this->db->from($this->config->item('table_bms_ti_budget_outlet').' bud');
+        $this->db->select('bud.*');
+        $this->db->where('year_id',$year_id-1);
+        $this->db->where('outlet_id',$outlet_id);
+        $this->db->join($this->config->item('table_login_setup_classification_varieties').' v','v.id = bud.variety_id','INNER');
+        $this->db->where('v.crop_type_id',$crop_type_id);
+        $results=$this->db->get()->result_array();
+
+        $previous_year_data=array();
+        foreach($results as $result)
+        {
+            $previous_year_data[$result['variety_id']][$result['year_index']]=$result;
+        }
 
         //getting previous data
         $this->db->from($this->config->item('table_bms_ti_budget_outlet').' bud');
@@ -172,6 +193,25 @@ class Ti_budget_outlet extends Root_Controller
             foreach($years_previous as $index=>$year_previous)
             {
                 $item['year'.($index+1).'_sell_quantity']='TODO';
+            }
+
+            //set year0 previous year budget
+            if(isset($previous_year_data[$item['variety_id']][0]))
+            {
+                $item['year0_previous_quantity']=$previous_year_data[$item['variety_id']][0]['quantity_budget'];
+            }
+            else
+            {
+                $item['year0_previous_quantity']='N/A';
+            }
+            //set year0 previous year prediction
+            if(isset($previous_year_data[$item['variety_id']][1]))
+            {
+                $item['year0_previous_prediction']=$previous_year_data[$item['variety_id']][1]['quantity_budget'];
+            }
+            else
+            {
+                $item['year0_previous_prediction']='N/A';
             }
             //set year 0 quantity
             if(isset($items_old[$item['variety_id']][0]))

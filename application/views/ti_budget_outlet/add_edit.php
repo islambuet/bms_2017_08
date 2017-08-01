@@ -45,6 +45,59 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
         </div>
         <div class="clearfix"></div>
     </div>
+    <?php
+    if($market_survey)
+    {
+        ?>
+        <div style="" class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right">Total Market Size</label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <label class="control-label"><?php echo number_format($market_survey['size_total'],3,'.','');?></label>
+            </div>
+        </div>
+        <div style="" class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right">Arm Market Size</label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <label class="control-label"><?php echo number_format($market_survey['size_arm'],3,'.','');?></label>
+            </div>
+        </div>
+        <div style="" class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right">Competitor Market Size</label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <label class="control-label"><?php echo number_format($market_survey['size_total']-$market_survey['size_arm'],3,'.','');?></label>
+            </div>
+        </div>
+        <div style="" class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right">Last Survey date</label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <label class="control-label"><?php echo System_helper::display_date($market_survey['date_created']);?></label>
+            </div>
+        </div>
+    <?php
+    }
+    else
+    {
+        ?>
+        <div style="" class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right">Market Survey</label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <label class="control-label">Not Done Yet</label>
+            </div>
+        </div>
+    <?php
+    }
+    ?>
+
     <div class="col-xs-12" id="system_jqx_container">
 
     </div>
@@ -56,7 +109,6 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
         $(document).off('click', '#button_action_save_jqx');
         $(document).on("click", "#button_action_save_jqx", function(event)
         {
-            $("#system_loading").show();
             $('#save_form_jqx #jqx_inputs').html('');
             var data=$('#system_jqx_container').jqxGrid('getrows');
             for(var i=0;i<data.length;i++)
@@ -97,6 +149,8 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                         <?php
                     }
                 ?>
+                { name: '<?php echo 'year0_previous_quantity';?>', type: 'string' },
+                { name: '<?php echo 'year0_previous_prediction';?>', type: 'string' },
                 { name: '<?php echo 'year0_budget_quantity';?>', type: 'string' },
                 { name: '<?php echo 'year0_budget_quantity_editable';?>', type: 'string' },
                 { name: 'sl_no', type: 'int' }
@@ -134,10 +188,12 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                     { text: '<?php echo $CI->lang->line('LABEL_VARIETY'); ?>',pinned:true, dataField: 'variety_name',width:'150',cellsrenderer: cellsrenderer,align:'center',editable:false},
                     <?php
                         for($i=0;$i<sizeof($years_previous);$i++)
-                        {?>{columngroup: 'previous_years',text: '<?php echo $years_previous[$i]['text']; ?>', dataField: '<?php echo 'year'.($i+1).'_sell_quantity';?>',width:'150',cellsrenderer: cellsrenderer,align:'center',cellsAlign:'right',editable:false},
+                        {?>{columngroup: 'previous_years',text: '<?php echo $years_previous[$i]['text']; ?>', dataField: '<?php echo 'year'.($i+1).'_sell_quantity';?>',width:'100',cellsrenderer: cellsrenderer,align:'center',cellsAlign:'right',editable:false},
                             <?php
                         }
                     ?>
+                    { columngroup: 'budgeted_year',text: 'Prev.Budget',dataField: 'year0_previous_quantity',width:'100',cellsrenderer: cellsrenderer,align:'center',cellsAlign:'right',editable:false},
+                    { columngroup: 'budgeted_year',text: 'Prev.Prediction',dataField: 'year0_previous_prediction',width:'100',cellsrenderer: cellsrenderer,align:'center',cellsAlign:'right',editable:false},
                     {
                         columngroup: 'budgeted_year',text: '<?php echo $year_current['text']; ?>', dataField: '<?php echo 'year0_budget_quantity';?>',align:'center',width:'100',cellsrenderer: cellsrenderer,cellsAlign:'right',columntype:'custom',
                         cellbeginedit: function (row)
@@ -180,7 +236,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 ],
                 columngroups:
                     [
-                        { text: '<?php echo $CI->lang->line('LABEL_PREVIOUS_YEARS'); ?>', align: 'center', name: 'previous_years' },
+                        { text: '<?php echo $CI->lang->line('LABEL_PREVIOUS_YEARS'); ?> Achieved', align: 'center', name: 'previous_years' },
                         { text: '<?php echo $CI->lang->line('LABEL_BUDGETED_YEAR'); ?>', align: 'center', name: 'budgeted_year' },
                         { text: '<?php echo $CI->lang->line('LABEL_NEXT_YEARS'); ?>', align: 'center', name: 'next_years' }
 
