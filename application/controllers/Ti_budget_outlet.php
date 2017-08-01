@@ -343,8 +343,10 @@ class Ti_budget_outlet extends Root_Controller
             $this->db->trans_complete();   //DB Transaction Handle END
             if ($this->db->trans_status() === TRUE)
             {
-                $this->message=$this->lang->line("MSG_SAVED_SUCCESS");
-                $this->system_search();
+                $ajax['status']=true;
+                $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>'');
+                $ajax['system_message']=$this->lang->line("MSG_SAVED_SUCCESS");
+                $this->json_return($ajax);
 
             }
             else
@@ -361,23 +363,4 @@ class Ti_budget_outlet extends Root_Controller
             $this->json_return($ajax);
         }
     }
-    private function check_my_editable($customer)
-    {
-        if(($this->locations['division_id']>0)&&($this->locations['division_id']!=$customer['division_id']))
-        {
-            return false;
-        }
-        if(($this->locations['zone_id']>0)&&($this->locations['zone_id']!=$customer['zone_id']))
-        {
-            return false;
-        }
-        if(($this->locations['territory_id']>0)&&($this->locations['territory_id']!=$customer['territory_id']))
-        {
-            return false;
-        }
-        return true;
-    }
-
-
-
 }
