@@ -144,54 +144,6 @@ $CI = & get_instance();
                     <label class="control-label"><?php echo $CI->lang->line('LABEL_TERRITORY_NAME');?><span style="color:#FF0000">*</span></label>
                 </div>
             </div>
-            <div style="<?php if(!(sizeof($districts)>0)){echo 'display:none';} ?>" class="row show-grid" id="district_id_container">
-                <div class="col-xs-6">
-                    <?php
-                    if($CI->locations['district_id']>0)
-                    {
-                        ?>
-                        <label class="control-label"><?php echo $CI->locations['district_name'];?></label>
-                        <input type="hidden" name="report[district_id]" value="<?php echo $CI->locations['district_id'];?>">
-                    <?php
-                    }
-                    else
-                    {
-                        ?>
-                        <select id="district_id" class="form-control" name="report[district_id]">
-                            <option value=""><?php echo $this->lang->line('SELECT');?></option>
-                            <?php
-                            foreach($districts as $district)
-                            {?>
-                                <option value="<?php echo $district['value']?>"><?php echo $district['text'];?></option>
-                            <?php
-                            }
-                            ?>
-                        </select>
-                    <?php
-                    }
-                    ?>
-                </div>
-                <div class="col-xs-6">
-                    <label class="control-label"><?php echo $CI->lang->line('LABEL_DISTRICT_NAME');?><span style="color:#FF0000">*</span></label>
-                </div>
-            </div>
-            <div style="<?php if(!(sizeof($outlets)>0)){echo 'display:none';} ?>" class="row show-grid" id="outlet_id_container">
-                <div class="col-xs-6">
-                    <select id="outlet_id" name="report[outlet_id]" class="form-control">
-                        <option value=""><?php echo $this->lang->line('SELECT');?></option>
-                        <?php
-                        foreach($outlets as $outlet)
-                        {?>
-                            <option value="<?php echo $outlet['value']?>"><?php echo $outlet['text'];?></option>
-                        <?php
-                        }
-                        ?>
-                    </select>
-                </div>
-                <div class="col-xs-6">
-                    <label class="control-label"><?php echo $CI->lang->line('LABEL_OUTLET_NAME');?><span style="color:#FF0000">*</span></label>
-                </div>
-            </div>
         </div>
         </div>
             <div class="row show-grid">
@@ -283,39 +235,6 @@ $CI = & get_instance();
             }
         });
         $(document).off('change', '#territory_id');
-        $(document).on('change','#territory_id',function()
-        {
-            $('#district_id').val('');
-            $('#outlet_id').val('');
-            $('#outlet_id_container').hide();
-            $('#district_id_container').hide();
-            var territory_id=$('#territory_id').val();
-            if(territory_id>0)
-            {
-                if(system_districts[territory_id]!==undefined)
-                {
-                    $('#district_id_container').show();
-                    $('#district_id').html(get_dropdown_with_select(system_districts[territory_id]));
-                }
-
-            }
-        });
-        $(document).off('change', '#district_id');
-        $(document).on('change','#district_id',function()
-        {
-            $('#outlet_id').val('');
-            var district_id=$('#district_id').val();
-            $('#outlet_id_container').hide();
-            if(district_id>0)
-            {
-                if(system_outlets[district_id]!==undefined)
-                {
-                    $('#outlet_id_container').show();
-                    $('#outlet_id').html(get_dropdown_with_select(system_outlets[district_id]));
-                }
-            }
-        });
-        $(document).off('change', '#outlet_id');
 
     });
 </script>

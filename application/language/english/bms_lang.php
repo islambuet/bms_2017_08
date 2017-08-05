@@ -6,6 +6,8 @@ $lang['MSG_LOGIN_SUCCESS'] = 'Successfully Logged In';
 $lang['MSG_LOGOUT_SUCCESS'] = 'Successfully Logged out';
 $lang['MSG_SITE_OFFLINE'] = 'Site is Currently Offline.Please contact with admin(01777709208).';
 $lang['MSG_LOCATION_NOT_ASSIGNED_OR_INVALID'] = 'No Location assigned.Please contact with admin(01777709208).';
+$lang['MSG_CONFIRM_SAVE'] = 'Are You Sure to save?';
+$lang['MSG_FORWARD_SUCCESS'] = 'Successfully Forwarded';
 
 //Action buttons
 $lang['ACTION_DASHBOARD'] = 'Dashboard';
@@ -14,6 +16,7 @@ $lang['ACTION_EDIT'] = 'Edit';
 $lang['ACTION_LOGOUT'] = 'Logout';
 $lang['ACTION_BACK'] = 'Back';
 $lang['ACTION_SAVE'] = 'Save';
+$lang['ACTION_FORWARD'] = 'Forward';
 $lang['ACTION_SAVE_NEW'] = 'Save and New';
 $lang['ACTION_DETAILS'] = 'Details';
 $lang['ACTION_REFRESH'] = 'Refresh';

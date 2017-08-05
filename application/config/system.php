@@ -6,10 +6,12 @@ $config['offline_controllers']=array('home','sys_site_offline');
 $config['external_controllers']=array('home');//user can use them without login
 $config['system_max_actions']=7;
 
+$config['system_status_yes']='Yes';
+$config['system_status_no']='No';
 $config['system_status_active']='Active';
 $config['system_status_inactive']='In-Active';
 $config['system_status_delete']='Deleted';
-$config['system_image_base_url']='http://localhost/tms_2017_07/';//depended on sites base url
+$config['system_image_base_url']='http://localhost/bms_2018_08/images/';//depended on sites base url
 
 $config['system_customer_type_outlet_id']=1;//depended on sites base url
 $config['num_year_budget_prediction']=3;//number of year predict budget
