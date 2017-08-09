@@ -54,7 +54,7 @@ if(isset($CI->permissions['action5']) && ($CI->permissions['action5']==1))
 $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 ?>
 <form class="form_valid" id="save_form_jqx" action="<?php echo site_url($CI->controller_url.'/index/save');?>" method="post">
-    <input type="hidden" name="zone_id" value="<?php echo $options['zone_id']; ?>" />
+    <input type="hidden" name="division_id" value="<?php echo $options['division_id']; ?>" />
     <input type="hidden" name="year_id" value="<?php echo $options['year_id']; ?>" />
     <input type="hidden" name="crop_type_id" value="<?php echo $options['crop_type_id']; ?>" />
 
@@ -201,7 +201,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                     url: '<?php echo site_url($CI->controller_url.'/index/forward');?>',
                     type: 'POST',
                     datatype: "JSON",
-                    data:{year_id:'<?php echo $options['year_id'];?>',zone_id:'<?php echo $options['zone_id'];?>',crop_type_id:'<?php echo $options['crop_type_id'];?>'},
+                    data:{year_id:'<?php echo $options['year_id'];?>',division_id:'<?php echo $options['division_id'];?>',crop_type_id:'<?php echo $options['crop_type_id'];?>'},
                     success: function (data, status)
                     {
 
@@ -297,8 +297,8 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                     { columngroup: 'year0',text: 'Prev.Prediction',dataField: 'year0_previous_prediction',width:'100',cellsrenderer: cellsrenderer,align:'center',cellsAlign:'right',editable:false},
                         <?php
                             for($i=0;$i<=sizeof($years_next);$i++)
-                            {?>{ columngroup: '<?php echo 'year'.($i); ?>',text: 'Territories', dataField: '<?php echo 'year'.($i).'_area_quantity';?>',align:'center',width:'80',cellsrenderer: cellsrenderer,cellsAlign:'right',editable:false},
-                        { columngroup: '<?php echo 'year'.($i); ?>',text: 'ZI', dataField: '<?php echo 'year'.($i).'_budget_quantity';?>',align:'center',width:'100',cellsrenderer: cellsrenderer,cellsAlign:'right',columntype:'custom',
+                            {?>{ columngroup: '<?php echo 'year'.($i); ?>',text: 'Zones', dataField: '<?php echo 'year'.($i).'_area_quantity';?>',align:'center',width:'80',cellsrenderer: cellsrenderer,cellsAlign:'right',editable:false},
+                        { columngroup: '<?php echo 'year'.($i); ?>',text: 'DI', dataField: '<?php echo 'year'.($i).'_budget_quantity';?>',align:'center',width:'100',cellsrenderer: cellsrenderer,cellsAlign:'right',columntype:'custom',
                         cellbeginedit: function (row)
                         {
                             var selectedRowData = $('#system_jqx_container').jqxGrid('getrowdata', row);//only last selected
@@ -329,7 +329,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                                 <?php
                             }
                         ?>
-                        { text: 'Territories', align: 'center', name: 'areas' }
+                        { text: 'Zones', align: 'center', name: 'areas' }
 
                     ]
             });
