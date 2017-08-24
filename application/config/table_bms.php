@@ -17,3 +17,6 @@ $config['table_bms_zi_forward'] = 'arm_bms_2017_08.bms_zi_forward';
 $config['table_bms_di_budget_di'] = 'arm_bms_2017_08.bms_di_budget_di';//zi budget and target table
 $config['table_bms_di_forward'] = 'arm_bms_2017_08.bms_di_forward';
 
+//HOM budget
+$config['table_bms_hom_budget_hom'] = 'arm_bms_2017_08.bms_hom_budget_hom';//zi budget and target table
+$config['table_bms_hom_forward'] = 'arm_bms_2017_08.bms_hom_forward';
