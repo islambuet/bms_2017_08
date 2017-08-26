@@ -186,3 +186,9 @@ $lang['LABEL_NUMBER_OF_COWORKER'] = 'Number Of Co-worker';
 $lang['LABEL_CHANGE_SUBORDINATE'] = 'Change Subordinate';
 $lang['LABEL_CHANGE_COWORKER'] = 'Change Coworker';
 
+
+$lang['MSG_ALREADY_FORWARDED'] = 'Already Forwarded.';
+$lang['MSG_SUCCESSFULLY_FORWARDED'] = 'Forwarded Successfully.';
+$lang['MSG_ALREADY_FINALIZED'] = 'Already Finalized.';
+
+
