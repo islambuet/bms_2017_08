@@ -308,6 +308,13 @@ class Hom_quantity_expectation extends Root_Controller
                     die();
                 }
             }
+            if(!$result)
+            {
+                $ajax['status']=false;
+                $ajax['system_message']='HOM Budget Not Forwarded Yet';
+                $this->json_return($ajax);
+                die();
+            }
         }
         $user = User_helper::get_user();
         $time=time();
