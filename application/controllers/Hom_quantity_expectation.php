@@ -375,7 +375,7 @@ class Hom_quantity_expectation extends Root_Controller
         if ($this->db->trans_status() === TRUE)
         {
             $ajax['status']=true;
-            $ajax['system_message']=$this->lang->line("MSG_SAVED_SUCCESS");
+            $this->message=$this->lang->line("MSG_SAVED_SUCCESS");
             $this->system_details($year0_id,$crop_type_id);
             die();
         }
