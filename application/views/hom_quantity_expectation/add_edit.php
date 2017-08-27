@@ -13,8 +13,8 @@ if((isset($CI->permissions['action1']) && ($CI->permissions['action1']==1))||(is
 if(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))
 {
     $action_buttons[]=array(
-        'label'=>$CI->lang->line("ACTION_EDIT"),
-        'href'=>site_url($CI->controller_url.'/index/edit/'.$year0_id)
+        'label'=>$CI->lang->line("ACTION_DETAILS"),
+        'href'=>site_url($CI->controller_url.'/index/details/'.$year0_id.'/'.$crop_type_id)
     );
 }
 if(isset($CI->permissions['action0']) && ($CI->permissions['action0']==1))
