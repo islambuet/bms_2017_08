@@ -13,25 +13,15 @@ class Hom_quantity_expectation extends Root_Controller
         $this->permissions=User_helper::get_permission('Hom_quantity_expectation');
         $this->controller_url='hom_quantity_expectation';
         $this->locations=User_helper::get_locations();
-        if(!is_array($this->locations))
+        if(!($this->locations))
         {
-            if($this->locations=='wrong')
-            {
-                $ajax['status']=false;
-                $ajax['system_message']=$this->lang->line('MSG_LOCATION_INVALID');
-                $this->json_return($ajax);
-            }
-            else
-            {
-                $ajax['status']=false;
-                $ajax['system_message']=$this->lang->line('MSG_LOCATION_NOT_ASSIGNED');
-                $this->json_return($ajax);
-            }
-
+            $ajax['status']=false;
+            $ajax['system_message']=$this->lang->line('MSG_LOCATION_NOT_ASSIGNED_OR_INVALID');
+            $this->json_return($ajax);
         }
     }
 
-    public function index($action="search",$id1=0,$id2=0,$id3=0)
+    public function index($action="search",$id1=0,$id2=0)
     {
         if($action=="search")
         {
@@ -105,10 +95,7 @@ class Hom_quantity_expectation extends Root_Controller
         {
             $data['year0_id']=$this->input->post('year0_id');
             $data['crop_id']=$this->input->post('crop_id');
-            $keys=',';
-            $keys.="year0_id:'".$data['year0_id']."',";
-            $keys.="crop_id:'".$data['crop_id']."',";
-            $data['keys']=trim($keys,',');
+            $data['options']=$data;
             $data['title']="Crop List";
             $ajax['status']=true;
             $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>$this->load->view($this->controller_url."/list",$data,true));
@@ -126,7 +113,7 @@ class Hom_quantity_expectation extends Root_Controller
         }
 
     }
-    private function system_get_items($year0_id)
+    private function system_get_items()
     {
         $year0_id=$this->input->post('year0_id');
         $crop_id=$this->input->post('crop_id');
@@ -150,7 +137,7 @@ class Hom_quantity_expectation extends Root_Controller
 
     private function system_edit($year0_id,$crop_type_id)
     {
-        if(isset($this->permissions['action0']) && ($this->permissions['action0']==1))
+        if((isset($this->permissions['action1']) && ($this->permissions['action1']==1)) || (isset($this->permissions['action2']) && ($this->permissions['action2']==1)) || (isset($this->permissions['action3']) && ($this->permissions['action3']==1)))
         {
             if(($this->input->post('id')))
             {
@@ -160,11 +147,10 @@ class Hom_quantity_expectation extends Root_Controller
             $data['years']=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text','date_start','date_end'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('id ASC'));
             $data['year0_id']=$year0_id;
             $data['crop_type_id']=$crop_type_id;
-            $keys=',';
-            $keys.="year0_id:'".$year0_id."',";
-            $keys.="crop_type_id:'".$crop_type_id."',";
-            $data['keys']=trim($keys,',');
-            $data['title']="Quantity Finalize For ".$crop_type['text'];
+            $data['options']=$data;
+
+            $data['year']=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"',' id ='.$year0_id),1);
+            $data['title']="Quantity Expectation For ".$crop_type['text'].' ('.$data['year']['text'].')';
             $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view($this->controller_url."/add_edit",$data,true));
             if($this->message)
             {
@@ -180,7 +166,7 @@ class Hom_quantity_expectation extends Root_Controller
             $this->json_return($ajax);
         }
     }
-    private function system_get_edit_items($task_purpose='edit')
+    private function system_get_edit_items()
     {
         $year0_id=$this->input->post('year0_id');
         $crop_type_id=$this->input->post('crop_type_id');
@@ -196,14 +182,8 @@ class Hom_quantity_expectation extends Root_Controller
         {
             $old_items[$result['variety_id']]=$result;
         }
-        $results=Query_helper::get_info($this->config->item('table_bms_hom_quantity_expectation'),'*',array('year_id ='.$year0_id)); //can filter by crop id to increase runtime
-        $old_quantity_expectation=array();//hom budget
-        foreach($results as $result)
-        {
-            $old_quantity_expectation[$result['variety_id']]=$result;
-        }
-        $results=Query_helper::get_info($this->config->item('table_bms_setup_bud_stock_minimum'),'*',array('revision =1'));//only for this crop could be done
-        $min_stocks=array();//hom budget
+        $results=Query_helper::get_info($this->config->item('table_bms_setup_bud_stock_minimum'),'*',array('revision =1'));
+        $min_stocks=array();//minimum stock
         foreach($results as $result)
         {
             $min_stocks[$result['variety_id']]=$result['quantity'];
@@ -238,10 +218,7 @@ class Hom_quantity_expectation extends Root_Controller
 
             //TODO check when stock warehouse task will complete
 
-            if(isset($old_quantity_expectation[$item['variety_id']]) && $old_quantity_expectation[$item['variety_id']]['stock_warehouse']>0)
-            {
-                $item['stock_warehouse']=$old_quantity_expectation[$item['variety_id']]['stock_warehouse'];
-            }elseif((isset($old_items[$result['id']]['stock_warehouse']))&&(($old_items[$result['id']]['stock_warehouse'])>0))
+            if((isset($old_items[$result['id']]['stock_warehouse']))&&(($old_items[$result['id']]['stock_warehouse'])>0))
             {
                 $item['stock_warehouse']=$old_items[$result['id']]['stock_warehouse'];
             }else
@@ -250,10 +227,7 @@ class Hom_quantity_expectation extends Root_Controller
             }
             //TODO check when stock outlet task will complete
 
-            if(isset($old_quantity_expectation[$item['variety_id']]) && $old_quantity_expectation[$item['variety_id']]['stock_outlet']>0)
-            {
-                $item['stock_outlet']=$old_quantity_expectation[$item['variety_id']]['stock_outlet'];
-            }elseif((isset($old_items[$result['id']]['stock_outlet']))&&(($old_items[$result['id']]['stock_outlet'])>0))
+            if((isset($old_items[$result['id']]['stock_outlet']))&&(($old_items[$result['id']]['stock_outlet'])>0))
             {
                 $item['stock_outlet']=$old_items[$result['id']]['stock_outlet'];
             }else
@@ -279,36 +253,36 @@ class Hom_quantity_expectation extends Root_Controller
             {
                 $item['stock_minimum']=0;
             }
-            if(isset($old_quantity_expectation[$item['variety_id']]))
+            if(isset($old_items[$item['variety_id']]['quantity_expected']))
             {
-                $item['quantity_expectation']=$old_quantity_expectation[$item['variety_id']]['quantity_expectation'];
+                $item['quantity_expected']=$old_items[$item['variety_id']]['quantity_expected'];
             }else
             {
-                $item['quantity_expectation']=0;
+                $item['quantity_expected']=0;
             }
             if(isset($this->permissions['action3']) && ($this->permissions['action3']==1))
             {
-                $item['quantity_expectation_editable']=true;
+                $item['quantity_expected_editable']=true;
             }
             else if(!$forwarded)
             {
                 if(isset($this->permissions['action2']) && ($this->permissions['action2']==1))
                 {
-                    $item['quantity_expectation_editable']=true;
+                    $item['quantity_expected_editable']=true;
                 }
-                else if(isset($this->permissions['action1']) && ($this->permissions['action1']==1) && ($item['quantity_expectation']==0))
+                else if(isset($this->permissions['action1']) && ($this->permissions['action1']==1) && ($item['quantity_expected']==0))
                 {
-                    $item['quantity_expectation_editable']=true;
+                    $item['quantity_expected_editable']=true;
 
                 }
                 else
                 {
-                    $item['quantity_expectation_editable']=false;
+                    $item['quantity_expected_editable']=false;
                 }
             }
             else//not delete and forwarded
             {
-                $item['quantity_expectation_editable']=false;
+                $item['quantity_expected_editable']=false;
             }
             $items[]=$item;
 
@@ -322,11 +296,11 @@ class Hom_quantity_expectation extends Root_Controller
         $crop_type_id=$this->input->post('crop_type_id');
         if((isset($this->permissions['action1']) && ($this->permissions['action1']==1))||(isset($this->permissions['action2']) && ($this->permissions['action2']==1))||(isset($this->permissions['action3']) && ($this->permissions['action3']==1)))
         {
-            $info=Query_helper::get_info($this->config->item('table_bms_hom_forward'),'*',array('year_id ='.$year0_id,'crop_type_id ='.$crop_type_id),1);
+            $result=Query_helper::get_info($this->config->item('table_bms_hom_forward'),'*',array('year_id ='.$year0_id,'crop_type_id ='.$crop_type_id),1);
 
-            if($info)
+            if($result)
             {
-                if($info['status_forward_quantity_expectation']===$this->config->item('system_status_yes'))
+                if($result['status_forward_quantity_expectation']===$this->config->item('system_status_yes'))
                 {
                     $ajax['status']=false;
                     $ajax['system_message']=$this->lang->line("MSG_ALREADY_FINALIZED");
@@ -341,46 +315,69 @@ class Hom_quantity_expectation extends Root_Controller
         $this->db->trans_start();
         if(sizeof($items)>0)
         {
-            $results=Query_helper::get_info($this->config->item('table_bms_hom_quantity_expectation'),'*',array('year_id ='.$year0_id));//can filter by crop id to increase runtime
+            $results=Query_helper::get_info($this->config->item('table_bms_hom_budget_hom'),'*',array('year_id ='.$year0_id,'year_index =0'));
             $old_items=array();//hom budget
             foreach($results as $result)
             {
                 $old_items[$result['variety_id']]=$result;
             }
+            $forwarded=false;
+            $result=Query_helper::get_info($this->config->item('table_bms_hom_forward'),'*',array('year_id ='.$year0_id,'crop_type_id ='.$crop_type_id),1);
+            if($result && $result['status_forward_quantity_expectation']==$this->config->item('system_status_yes'))
+            {
+                $forwarded=true;
+            }
 
             foreach($items as $variety_id=>$variety)
             {
                 $data=array();
-                $data['year_id']=$year0_id;
-                $data['variety_id']=$variety_id;
+                $year_id=$year0_id;
                 $data['stock_warehouse']=$variety['stock_warehouse'];
                 $data['stock_outlet']=$variety['stock_outlet'];
                 $data['stock_minimum']=$variety['stock_minimum'];
-                $data['quantity_expectation']=$variety['quantity_expectation'];
+                $quantity_expected=$variety['quantity_expected'];
                 if(isset($old_items[$variety_id]))
                 {
-                    $data['user_updated'] = $user->user_id;
-                    $data['date_updated'] = $time;
-                    if($variety['stock_minimum']!=$old_items[$variety_id]['quantity_expectation'])
+                    if($old_items[$variety_id]['quantity_expected']!=$quantity_expected)
                     {
-                        Query_helper::update($this->config->item('table_bms_hom_quantity_expectation'),$data,array("id = ".$old_items[$variety_id]['id']));
+                        $editable=false;
+                        if(isset($this->permissions['action3']) && ($this->permissions['action3']==1))
+                        {
+                            $editable=true;
+                        }
+                        else if(!$forwarded)
+                        {
+                            if(isset($this->permissions['action2']) && ($this->permissions['action2']==1))
+                            {
+                                $editable=true;
+                            }
+                            else if(isset($this->permissions['action1']) && ($this->permissions['action1']==1) && ($old_items[$variety_id]['quantity_expected']==0))
+                            {
+                                $editable=true;
+                            }
+                        }
+                        if($editable)
+                        {
+                            $this->db->where('variety_id',$variety_id);
+                            $this->db->where('year_id',$year_id);
+                            $this->db->where('year_index',0);
+                            $this->db->set('revision_quantity_expected','revision_quantity_expected+1',false);
+                            $this->db->set('quantity_expected',$quantity_expected);
+                            $this->db->set('date_quantity_expected',$time);
+                            $this->db->set('user_quantity_expected',$user->user_id);
+                            $this->db->update($this->config->item('table_bms_hom_budget_hom'));
+                        }
                     }
-                }
-                else
-                {
-                    $data['user_created'] = $user->user_id;
-                    $data['date_created'] = $time;
-                    Query_helper::add($this->config->item('table_bms_hom_quantity_expectation'),$data);
                 }
             }
         }
-
         $this->db->trans_complete();   //DB Transaction Handle END
         if ($this->db->trans_status() === TRUE)
         {
-            $ajax['status']=false;
+            $ajax['status']=true;
             $ajax['system_message']=$this->lang->line("MSG_SAVED_SUCCESS");
-            $this->json_return($ajax);
+            $this->system_details($year0_id,$crop_type_id);
+            die();
         }
         else
         {
@@ -397,15 +394,18 @@ class Hom_quantity_expectation extends Root_Controller
             {
                 $crop_type_id=$this->input->post('id');
             }
+            $data['year0_id']=$year0_id;
+            $data['crop_type_id']=$crop_type_id;
+            $data['options']=$data;
             $crop_type=Query_helper::get_info($this->config->item('table_login_setup_classification_crop_types'),array('id value','name text'),array('id ='.$crop_type_id),1);
+            $data['hom_forward_info']=Query_helper::get_info($this->config->item('table_bms_hom_forward'),'*',array('year_id ='.$year0_id,'crop_type_id ='.$crop_type_id),1);
+
             $data['years']=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text','date_start','date_end'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('id ASC'));
             $data['year0_id']=$year0_id;
             $data['crop_type_id']=$crop_type_id;
-            $keys=',';
-            $keys.="year0_id:'".$year0_id."',";
-            $keys.="crop_type_id:'".$crop_type_id."',";
-            $data['keys']=trim($keys,',');
-            $data['title']="Quantity Finalize For ".$crop_type['text'];
+            $data['options']=$data;
+            $data['year']=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"',' id ='.$year0_id),1);
+            $data['title']="Quantity Expectation For ".$crop_type['text'].' ('.$data['year']['text'].')';
             $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view($this->controller_url."/details",$data,true));
             if($this->message)
             {
@@ -422,15 +422,17 @@ class Hom_quantity_expectation extends Root_Controller
         }
     }
 
-    private function system_forward($year0_id,$crop_type_id)
+    private function system_forward()
     {
+        $year0_id=$this->input->post('year0_id');
+        $crop_type_id=$this->input->post('crop_type_id');
         $user = User_helper::get_user();
         $time=time();
-        $info=Query_helper::get_info($this->config->item('table_bms_hom_forward'),'*',array('year_id ='.$year0_id,'crop_type_id ='.$crop_type_id),1);
+        $result=Query_helper::get_info($this->config->item('table_bms_hom_forward'),'*',array('year_id ='.$year0_id,'crop_type_id ='.$crop_type_id),1);
         $this->db->trans_start();
-        if($info)
+        if($result)
         {
-            if($info['status_forward_quantity_expectation']===$this->config->item('system_status_yes'))
+            if($result['status_forward_quantity_expectation']===$this->config->item('system_status_yes'))
             {
                 $ajax['status']=false;
                 $ajax['system_message']=$this->lang->line("MSG_ALREADY_FORWARDED");
@@ -443,13 +445,13 @@ class Hom_quantity_expectation extends Root_Controller
                 $data['status_forward_quantity_expectation']=$this->config->item('system_status_yes');
                 $data['user_forward_quantity_expectation'] = $user->user_id;
                 $data['date_forward_quantity_expectation'] = $time;
-                Query_helper::update($this->config->item('table_bms_hom_forward'),$data,array("id = ".$info['id']));
+                Query_helper::update($this->config->item('table_bms_hom_forward'),$data,array("id = ".$result['id']));
             }
         }
         else
         {
             $ajax['status']=true;
-            $ajax['system_message']='HOM Budget Not forwarded Yet!';
+            $ajax['system_message']='HOM Budget Not Forwarded Yet!';
             $this->json_return($ajax);
         }
         $this->db->trans_complete();   //DB Transaction Handle END
