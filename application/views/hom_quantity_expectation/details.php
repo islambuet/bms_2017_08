@@ -2,6 +2,13 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 $CI=& get_instance();
 $action_buttons=array();
+if(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))
+{
+    $action_buttons[]=array(
+        'label'=>$CI->lang->line("ACTION_EDIT"),
+        'href'=>site_url($CI->controller_url.'/index/edit/'.$year0_id.'/'.$crop_type_id)
+    );
+}
 if((isset($CI->permissions['action1']) && ($CI->permissions['action1']==1))||(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))||(isset($CI->permissions['action3']) && ($CI->permissions['action3']==1)))
 {
     $action_buttons[]=array(
