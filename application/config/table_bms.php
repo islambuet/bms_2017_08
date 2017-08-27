@@ -25,6 +25,3 @@ $config['table_bms_di_forward'] = 'arm_bms_2017_08.bms_di_forward';
 $config['table_bms_hom_budget_hom'] = 'arm_bms_2017_08.bms_hom_budget_hom';//zi budget and target table
 $config['table_bms_hom_forward'] = 'arm_bms_2017_08.bms_hom_forward';
 $config['table_bms_setup_bud_stock_minimum'] = 'arm_bms_2017_08.bms_setup_bud_stock_minimum';
-
-$config['table_bms_hom_quantity_expectation'] = 'arm_bms_2017_08.bms_hom_quantity_expectation';
-
