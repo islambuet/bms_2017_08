@@ -81,6 +81,14 @@ $CI = & get_instance();
                 }
             });
         }
+        else if(year0_id==0)
+        {
+            animate_message('Please Select a Fiscal Year');
+        }
+        else if(crop_id==0)
+        {
+            animate_message('Please Select a Crop');
+        }
     }
     jQuery(document).ready(function()
     {
