@@ -85,7 +85,8 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             id: 'id',
             url: url,
             type: 'POST',
-            data:{<?php echo $keys; ?>}
+            data:JSON.parse('<?php echo json_encode($options);?>')
+
         };
         var dataAdapter = new $.jqx.dataAdapter(source);
 

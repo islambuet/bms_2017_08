@@ -2,14 +2,14 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 $CI=& get_instance();
 $action_buttons=array();
-if(isset($CI->permissions['action0']) && ($CI->permissions['action0']==1))
+if((isset($CI->permissions['action1']) && ($CI->permissions['action1']==1))||(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))||(isset($CI->permissions['action3']) && ($CI->permissions['action3']==1)))
 {
     $action_buttons[]=array(
+        'type'=>'button',
         'label'=>$CI->lang->line("ACTION_FORWARD"),
-        'href'=>site_url($CI->controller_url.'/index/forward/'.$year0_id.'/'.$crop_type_id)
+        'id'=>'button_action_forward'
     );
 }
-
 if(isset($CI->permissions['action4']) && ($CI->permissions['action4']==1))
 {
     $action_buttons[]=array(
@@ -51,6 +51,31 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 <script type="text/javascript">
     $(document).ready(function ()
     {
+        $(document).off('click', '#button_action_forward');
+        $(document).on("click", "#button_action_forward", function(event)
+        {
+            var sure = confirm('Are Your Sure to Forward?');
+            if(sure)
+            {
+                $.ajax({
+                    url: '<?php echo site_url($CI->controller_url.'/index/forward');?>',
+                    type: 'POST',
+                    datatype: "JSON",
+                    data:{year0_id:'<?php echo $options['year0_id'];?>',crop_type_id:'<?php echo $options['crop_type_id'];?>'},
+                    success: function (data, status)
+                    {
+
+                    },
+                    error: function (xhr, desc, err)
+                    {
+                        console.log("error");
+
+                    }
+                });
+            }
+
+        });
+
         var url = "<?php echo site_url($CI->controller_url.'/index/get_detail_items');?>";
 
         // prepare the data
@@ -67,12 +92,12 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 { name: 'stock_outlet', type: 'string' },
                 { name: 'stock_total', type: 'string' },
                 { name: 'stock_minimum', type: 'string' },
-                { name: 'quantity_expectation', type: 'string' }
+                { name: 'quantity_expected', type: 'string' }
             ],
             id: 'id',
             url: url,
             type: 'POST',
-            data:{<?php echo $keys; ?>}
+            data:JSON.parse('<?php echo json_encode($options);?>')
         };
         var dataAdapter = new $.jqx.dataAdapter(source);
         var cellsrenderer = function(row, column, value, defaultHtml, columnSettings, record)
@@ -101,7 +126,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                     { text: 'Outlet Stock',dataField: 'stock_outlet',width:'130',cellsrenderer: cellsrenderer,align:'center',cellsAlign:'right'},
                     { text: 'Total Stock',dataField: 'stock_total',width:'130',cellsrenderer: cellsrenderer,align:'center',cellsAlign:'right'},
                     { text: 'Minimum Stock',dataField: 'stock_minimum',width:'130',cellsrenderer: cellsrenderer,align:'center',cellsAlign:'right'},
-                    { text: 'Quantity Expectation',dataField: 'quantity_expectation',width:'170',cellsrenderer: cellsrenderer,align:'center',cellsAlign:'right'}
+                    { text: 'Quantity Expectation',dataField: 'quantity_expected',width:'170',cellsrenderer: cellsrenderer,align:'center',cellsAlign:'right'}
                 ]
             });
     });

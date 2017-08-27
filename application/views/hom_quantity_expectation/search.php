@@ -8,7 +8,6 @@ $CI = & get_instance();
         </div>
         <div class="clearfix"></div>
     </div>
-
     <div class="row show-grid">
         <div class="col-xs-4">
             <label class="control-label pull-right"><?php echo $this->lang->line('LABEL_FISCAL_YEAR');?></label>
@@ -36,14 +35,26 @@ $CI = & get_instance();
             </select>
         </div>
     </div>
+    <div class="row show-grid">
+        <div class="col-xs-4">
+
+        </div>
+        <div class="col-xs-4">
+            <div class="action_button pull-right">
+                <button id="load_form" class="btn">Load Form</button>
+            </div>
+
+        </div>
+        <div class="col-xs-4">
+
+        </div>
+    </div>
 </div>
 <div id="system_report_container">
 
 </div>
 
 <div class="clearfix"></div>
-
-
 <script type="text/javascript">
     function load_crop_types()
     {
@@ -55,7 +66,10 @@ $CI = & get_instance();
                 url: '<?php echo site_url($CI->controller_url.'/index/list');?>',
                 type: 'POST',
                 datatype: "JSON",
-                data:{year0_id:year0_id,crop_id:crop_id},
+                data:{
+                    year0_id:year0_id,
+                    crop_id:crop_id
+                },
                 success: function (data, status)
                 {
 
@@ -68,31 +82,21 @@ $CI = & get_instance();
             });
         }
     }
-    $('#crop_id').html(get_dropdown_with_select(system_crops));
-    $(document).off('change', '#year0_id');
-    $(document).off('change', '#crop_id');
-    $(document).on('change','#crop_id',function()
+    jQuery(document).ready(function()
     {
-        load_crop_types();
-        $('#system_report_container').html('');
-        $('#year_id').val('');
-        var crop_id=$('#crop_id').val();
-        if(crop_id>0)
+        system_preset({controller:'<?php echo $CI->router->class; ?>'});
+        $(document).off('click', '#load_form');
+        //load_crop_types();
+        $(document).off("change","#year0_id");
+        $(document).off('change', '#crop_id');
+        $('#crop_id').html(get_dropdown_with_select(system_crops));
+        $(document).on("change","#crop_id,#year0_id",function()
+        {
+            $('#system_report_container').html('');
+        });
+        $(document).on('click','#load_form',function(event)
         {
             load_crop_types();
-        }
-
-    });
-    $(document).on('change','#year0_id',function()
-    {
-        load_crop_types();
-        $('#system_report_container').html('');
-        $('#year_id').val('');
-        var crop_id=$('#crop_id').val();
-        if(crop_id>0)
-        {
-            load_crop_types();
-        }
-
+        });
     });
 </script>
