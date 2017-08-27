@@ -17,7 +17,7 @@ if(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))
         'href'=>site_url($CI->controller_url.'/index/details/'.$year0_id.'/'.$crop_type_id)
     );
 }
-if(isset($CI->permissions['action0']) && ($CI->permissions['action0']==1))
+if((isset($CI->permissions['action1']) && ($CI->permissions['action1']==1))||(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))||(isset($CI->permissions['action3']) && ($CI->permissions['action3']==1)))
 {
     $action_buttons[]=array(
         'label'=>$CI->lang->line("ACTION_FORWARD"),
