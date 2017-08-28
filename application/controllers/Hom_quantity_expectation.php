@@ -140,6 +140,9 @@ class Hom_quantity_expectation extends Root_Controller
             {
                 $data['quantity_expectation_info']['status_quantity_expectation']='Forwarded';
                 $data['quantity_expectation_info']['date_forward_quantity_expectation']=System_helper::display_date_time($result['date_forward_quantity_expectation']);
+            }elseif($result['quantity_expected']<=0)
+            {
+                $data['quantity_expectation_info']['status_quantity_expectation']='Not Done';
             }
             else
             {
