@@ -2,44 +2,37 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 $CI=& get_instance();
 $action_buttons=array();
-if($quantity_expectation_info['status_quantity_expectation']=='Forwarded')
+if((isset($CI->permissions['action1']) && ($CI->permissions['action1']==1))||(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))||(isset($CI->permissions['action3']) && ($CI->permissions['action3']==1)))
 {
-    if((isset($CI->permissions['action3']) && ($CI->permissions['action3']==1)))
+    if($quantity_expectation_info['status_quantity_expectation']=='Forwarded')
+    {
+        if((isset($CI->permissions['action3']) && ($CI->permissions['action3']==1)))
+        {
+            $action_buttons[]=array(
+                'type'=>'button',
+                'label'=>$CI->lang->line("ACTION_SAVE"),
+                'id'=>'button_action_save_jqx'
+            );
+        }
+    }
+    else
     {
         $action_buttons[]=array(
             'type'=>'button',
             'label'=>$CI->lang->line("ACTION_SAVE"),
             'id'=>'button_action_save_jqx'
         );
+        if($quantity_expectation_info['quantity_expected']>0)
+        {
+            $action_buttons[]=array(
+                'type'=>'button',
+                'label'=>$CI->lang->line("ACTION_FORWARD"),
+                'id'=>'button_action_forward'
+            );
+        }
+
     }
 }
-else
-{
-    $action_buttons[]=array(
-        'type'=>'button',
-        'label'=>$CI->lang->line("ACTION_SAVE"),
-        'id'=>'button_action_save_jqx'
-    );
-    if($quantity_expectation_info['quantity_expected']>0)
-    {
-        $action_buttons[]=array(
-            'type'=>'button',
-            'label'=>$CI->lang->line("ACTION_FORWARD"),
-            'id'=>'button_action_forward'
-        );
-    }
-}
-//if((isset($CI->permissions['action1']) && ($CI->permissions['action1']==1))||(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))||(isset($CI->permissions['action3']) && ($CI->permissions['action3']==1)))
-//{
-//    if($quantity_expectation_info['status_quantity_expectation']=='Not Forwarded')
-//    {
-//        $action_buttons[]=array(
-//            'type'=>'button',
-//            'label'=>$CI->lang->line("ACTION_FORWARD"),
-//            'id'=>'button_action_forward'
-//        );
-//    }
-//}
 if(isset($CI->permissions['action4']) && ($CI->permissions['action4']==1))
 {
     $action_buttons[]=array(
