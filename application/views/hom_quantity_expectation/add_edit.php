@@ -2,7 +2,18 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 $CI=& get_instance();
 $action_buttons=array();
-if((isset($CI->permissions['action1']) && ($CI->permissions['action1']==1))||(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))||(isset($CI->permissions['action3']) && ($CI->permissions['action3']==1)))
+if($quantity_expectation_info['status_quantity_expectation']=='Forwarded')
+{
+    if((isset($CI->permissions['action3']) && ($CI->permissions['action3']==1)))
+    {
+        $action_buttons[]=array(
+            'type'=>'button',
+            'label'=>$CI->lang->line("ACTION_SAVE"),
+            'id'=>'button_action_save_jqx'
+        );
+    }
+}
+else
 {
     $action_buttons[]=array(
         'type'=>'button',
@@ -14,17 +25,9 @@ if(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))
 {
     $action_buttons[]=array(
         'label'=>$CI->lang->line("ACTION_DETAILS"),
-        'href'=>site_url($CI->controller_url.'/index/details/'.$year0_id.'/'.$crop_type_id)
+        'href'=>site_url($CI->controller_url.'/index/details/'.$options['year_id'].'/'.$options['crop_type_id'])
     );
 }
-if((isset($CI->permissions['action1']) && ($CI->permissions['action1']==1))||(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))||(isset($CI->permissions['action3']) && ($CI->permissions['action3']==1)))
-{
-    $action_buttons[]=array(
-        'label'=>$CI->lang->line("ACTION_FORWARD"),
-        'href'=>site_url($CI->controller_url.'/index/forward/'.$year0_id.'/'.$crop_type_id)
-    );
-}
-
 if(isset($CI->permissions['action4']) && ($CI->permissions['action4']==1))
 {
     $action_buttons[]=array(
@@ -52,8 +55,11 @@ $action_buttons[]=array(
 $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 ?>
 <form class="form_valid" id="save_form_jqx" action="<?php echo site_url($CI->controller_url.'/index/save');?>" method="post">
-    <input type="hidden" name="year0_id" value="<?php echo $year0_id; ?>" />
-    <input type="hidden" name="crop_type_id" value="<?php echo $crop_type_id; ?>" />
+    <input type="hidden" name="year_id" value="<?php echo $options['year_id']; ?>" />
+    <input type="hidden" name="crop_type_id" value="<?php echo $options['crop_type_id']; ?>" />
+
+    <div id="jqx_inputs">
+    </div>
 </form>
 <div class="row widget">
     <div class="widget-header">
@@ -62,11 +68,50 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
         </div>
         <div class="clearfix"></div>
     </div>
+    <div style="" class="row show-grid">
+        <div class="col-xs-4">
+            <label class="control-label pull-right">Quantity Expectation Status</label>
+        </div>
+        <div class="col-sm-4 col-xs-8">
+            <label class="control-label"><?php echo $quantity_expectation_info['status_quantity_expectation'];?></label>
+        </div>
+    </div>
+    <div style="" class="row show-grid">
+        <div class="col-xs-4">
+            <label class="control-label pull-right">Last Quantity Expected By</label>
+        </div>
+        <div class="col-sm-4 col-xs-8">
+            <label class="control-label"><?php echo $quantity_expectation_info['user_quantity_expected'];?></label>
+        </div>
+    </div>
+    <div style="" class="row show-grid">
+        <div class="col-xs-4">
+            <label class="control-label pull-right">Last Quantity Expected time</label>
+        </div>
+        <div class="col-sm-4 col-xs-8">
+            <label class="control-label"><?php echo $quantity_expectation_info['date_quantity_expected'];?></label>
+        </div>
+    </div>
+    <div style="" class="row show-grid">
+        <div class="col-xs-4">
+            <label class="control-label pull-right">Quantity Expectation Forwarded By</label>
+        </div>
+        <div class="col-sm-4 col-xs-8">
+            <label class="control-label"><?php echo $quantity_expectation_info['user_forward_quantity_expectation'];?></label>
+        </div>
+    </div>
+    <div style="" class="row show-grid">
+        <div class="col-xs-4">
+            <label class="control-label pull-right">Forwarded time</label>
+        </div>
+        <div class="col-sm-4 col-xs-8">
+            <label class="control-label"><?php echo $quantity_expectation_info['date_forward_quantity_expectation'];?></label>
+        </div>
+    </div>
     <div class="col-xs-12" id="system_jqx_container">
 
     </div>
 </div>
-
 <script type="text/javascript">
     $(document).ready(function ()
     {
@@ -78,10 +123,10 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             {
                 if(data[i]['quantity_expected_editable'])
                 {
-                    $('#save_form_jqx').append('<input type="hidden" id="items_'+data[i]['variety_id']+'_stock_warehouse" name="items['+data[i]['variety_id']+'][stock_warehouse]" value="'+data[i]['stock_warehouse']+'">');
-                    $('#save_form_jqx').append('<input type="hidden" id="items_'+data[i]['variety_id']+'_stock_warehouse" name="items['+data[i]['variety_id']+'][stock_outlet]" value="'+data[i]['stock_outlet']+'">');
-                    $('#save_form_jqx').append('<input type="hidden" id="items_'+data[i]['variety_id']+'_stock_warehouse" name="items['+data[i]['variety_id']+'][stock_minimum]" value="'+data[i]['stock_minimum']+'">');
-                    $('#save_form_jqx').append('<input type="hidden" id="items_'+data[i]['variety_id']+'_quantity_expected" name="items['+data[i]['variety_id']+'][quantity_expected]" value="'+data[i]['quantity_expected']+'">');
+                    $('#save_form_jqx #jqx_inputs').append('<input type="hidden" name="items['+data[i]['variety_id']+'][stock_warehouse]" value="'+data[i]['stock_warehouse']+'">');
+                    $('#save_form_jqx #jqx_inputs').append('<input type="hidden" name="items['+data[i]['variety_id']+'][stock_outlet]" value="'+data[i]['stock_outlet']+'">');
+                    $('#save_form_jqx #jqx_inputs').append('<input type="hidden" name="items['+data[i]['variety_id']+'][stock_minimum]" value="'+data[i]['stock_minimum']+'">');
+                    $('#save_form_jqx #jqx_inputs').append('<input type="hidden" name="items['+data[i]['variety_id']+'][quantity_expected]" value="'+data[i]['quantity_expected']+'">');
                 }
             }
             var sure = confirm('<?php echo $CI->lang->line('MSG_CONFIRM_SAVE'); ?>');

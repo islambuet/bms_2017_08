@@ -2,13 +2,6 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 $CI=& get_instance();
 $action_buttons=array();
-if(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))
-{
-    $action_buttons[]=array(
-        'label'=>$CI->lang->line("ACTION_EDIT"),
-        'href'=>site_url($CI->controller_url.'/index/edit/'.$year0_id.'/'.$crop_type_id)
-    );
-}
 if((isset($CI->permissions['action1']) && ($CI->permissions['action1']==1))||(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))||(isset($CI->permissions['action3']) && ($CI->permissions['action3']==1)))
 {
     $action_buttons[]=array(
@@ -61,6 +54,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
         $(document).off('click', '#button_action_forward');
         $(document).on("click", "#button_action_forward", function(event)
         {
+//            alert('hi');
             var sure = confirm('Are Your Sure to Forward?');
             if(sure)
             {
@@ -68,7 +62,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                     url: '<?php echo site_url($CI->controller_url.'/index/forward');?>',
                     type: 'POST',
                     datatype: "JSON",
-                    data:{year0_id:'<?php echo $options['year0_id'];?>',crop_type_id:'<?php echo $options['crop_type_id'];?>'},
+                    data:{year_id:'<?php echo $options['year_id'];?>',crop_type_id:'<?php echo $options['crop_type_id'];?>'},
                     success: function (data, status)
                     {
 
