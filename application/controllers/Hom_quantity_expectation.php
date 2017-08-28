@@ -394,7 +394,7 @@ class Hom_quantity_expectation extends Root_Controller
         $data['years']=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text','date_start','date_end'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('id ASC'));
         $data['year']=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"',' id ='.$year_id),1);
         $data['title']="Quantity Expectation For ".$crop_type['text'].' ('.$data['year']['text'].')';
-        $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view($this->controller_url."/details",$data,true));
+        $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>$this->load->view($this->controller_url."/details",$data,true));
         if($this->message)
         {
             $ajax['system_message']=$this->message;
