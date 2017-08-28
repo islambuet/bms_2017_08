@@ -107,9 +107,7 @@ class Hom_quantity_expectation extends Root_Controller
         $this->db->join($this->config->item('table_bms_hom_forward').' forward','forward.year_id = '.$reports['year_id'].' and forward.crop_type_id = '.$reports['crop_type_id'],'LEFT');
         $this->db->order_by('bud.revision_budget','DESC');
         $result=$this->db->get()->row_array();
-//        print_r($result);exit;
         $data['quantity_expectation_info']['quantity_expected']=0;
-        $data['quantity_expectation_info']['status_quantity_expectation']='Not Done';
         $data['quantity_expectation_info']['date_quantity_expected']='N/A';
         $data['quantity_expectation_info']['user_quantity_expected']='N/A';
         $data['quantity_expectation_info']['date_forward_quantity_expectation']='N/A';
@@ -140,13 +138,14 @@ class Hom_quantity_expectation extends Root_Controller
             {
                 $data['quantity_expectation_info']['status_quantity_expectation']='Forwarded';
                 $data['quantity_expectation_info']['date_forward_quantity_expectation']=System_helper::display_date_time($result['date_forward_quantity_expectation']);
-            }elseif($result['quantity_expected']<=0)
+            }
+            elseif($result['revision_quantity_expected']>0 && $result['status_forward_quantity_expectation']!=$this->config->item('system_status_yes'))
             {
-                $data['quantity_expectation_info']['status_quantity_expectation']='Not Done';
+                $data['quantity_expectation_info']['status_quantity_expectation']='Not Forwarded';
             }
             else
             {
-                $data['quantity_expectation_info']['status_quantity_expectation']='Not Forwarded';
+                $data['quantity_expectation_info']['status_quantity_expectation']='Not Done';
             }
             $data['quantity_expectation_info']['date_quantity_expected']=System_helper::display_date_time($result['date_quantity_expected']);
         }
