@@ -109,7 +109,7 @@ class Hom_quantity_expectation extends Root_Controller
         $result=$this->db->get()->row_array();
 //        print_r($result);exit;
         $data['quantity_expectation_info']['quantity_expected']=0;
-        $data['quantity_expectation_info']['status_quantity_expectation']='Not Forwarded';
+        $data['quantity_expectation_info']['status_quantity_expectation']='Not Done';
         $data['quantity_expectation_info']['date_quantity_expected']='N/A';
         $data['quantity_expectation_info']['user_quantity_expected']='N/A';
         $data['quantity_expectation_info']['date_forward_quantity_expectation']='N/A';
