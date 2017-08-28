@@ -101,19 +101,22 @@ class Hom_quantity_expectation extends Root_Controller
         $this->db->select('bud.*');
         $this->db->select('forward.status_forward_quantity_expectation,forward.date_forward_quantity_expectation,forward.user_forward_quantity_expectation');
         $this->db->where('bud.year_id',$reports['year_id']);
+        $this->db->where('bud.year_index',0);
         $this->db->join($this->config->item('table_login_setup_classification_varieties').' v','v.id = bud.variety_id','INNER');
         $this->db->where('v.crop_type_id',$reports['crop_type_id']);
         $this->db->join($this->config->item('table_bms_hom_forward').' forward','forward.year_id = '.$reports['year_id'].' and forward.crop_type_id = '.$reports['crop_type_id'],'LEFT');
         $this->db->order_by('bud.revision_budget','DESC');
         $result=$this->db->get()->row_array();
-        //print_r($result);exit;
-        $data['quantity_expectation_info']['status_quantity_expectation']='Not Done';
+//        print_r($result);exit;
+        $data['quantity_expectation_info']['quantity_expected']=0;
+        $data['quantity_expectation_info']['status_quantity_expectation']='Not Forwarded';
         $data['quantity_expectation_info']['date_quantity_expected']='N/A';
         $data['quantity_expectation_info']['user_quantity_expected']='N/A';
         $data['quantity_expectation_info']['date_forward_quantity_expectation']='N/A';
         $data['quantity_expectation_info']['user_forward_quantity_expectation']='N/A';
         if($result)
         {
+            $data['quantity_expectation_info']['quantity_expected']=$result['quantity_expected'];
             $user_ids=array();
             $user_ids[$result['user_quantity_expected']]=$result['user_quantity_expected'];
             $user_ids[$result['user_forward_quantity_expectation']]=$result['user_forward_quantity_expectation'];
@@ -144,6 +147,8 @@ class Hom_quantity_expectation extends Root_Controller
             }
             $data['quantity_expectation_info']['date_quantity_expected']=System_helper::display_date_time($result['date_quantity_expected']);
         }
+//        print_r($data['quantity_expectation_info']);
+//        exit;
         $data['title']="Quantity Expectation For ".$crop_type['text'].' ('.$data['year']['text'].')';
         $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>$this->load->view($this->controller_url."/add_edit",$data,true));
         if($this->message)
@@ -409,32 +414,52 @@ class Hom_quantity_expectation extends Root_Controller
         $crop_type_id=$this->input->post('crop_type_id');
         $user = User_helper::get_user();
         $time=time();
-        $result=Query_helper::get_info($this->config->item('table_bms_hom_forward'),'*',array('year_id ='.$year_id,'crop_type_id ='.$crop_type_id),1);
-        $this->db->trans_start();
-        if($result)
+
+        $this->db->from($this->config->item('table_bms_hom_budget_hom').' bud');
+        $this->db->select('bud.*');
+        $this->db->select('forward.status_forward_quantity_expectation,forward.date_forward_quantity_expectation,forward.user_forward_quantity_expectation');
+        $this->db->where('bud.year_id',$year_id);
+        $this->db->where('bud.year_index',0);
+        $this->db->join($this->config->item('table_login_setup_classification_varieties').' v','v.id = bud.variety_id','INNER');
+        $this->db->where('v.crop_type_id',$crop_type_id);
+        $this->db->join($this->config->item('table_bms_hom_forward').' forward','forward.year_id = '.$year_id.' and forward.crop_type_id = '.$crop_type_id,'LEFT');
+        $this->db->order_by('bud.revision_budget','DESC');
+        $result=$this->db->get()->row_array();
+        if($result['quantity_expected']>0)
         {
-            if($result['status_forward_quantity_expectation']===$this->config->item('system_status_yes'))
+            $result=Query_helper::get_info($this->config->item('table_bms_hom_forward'),'*',array('year_id ='.$year_id,'crop_type_id ='.$crop_type_id),1);
+            $this->db->trans_start();
+            if($result)
             {
-                $ajax['status']=false;
-                $ajax['system_message']=$this->lang->line("MSG_ALREADY_FORWARDED");
-                $this->json_return($ajax);
-                die();
+                if($result['status_forward_quantity_expectation']===$this->config->item('system_status_yes'))
+                {
+                    $ajax['status']=false;
+                    $ajax['system_message']=$this->lang->line("MSG_ALREADY_FORWARDED");
+                    $this->json_return($ajax);
+                    die();
+                }
+                else
+                {
+                    $data=array();
+                    $data['status_forward_quantity_expectation']=$this->config->item('system_status_yes');
+                    $data['user_forward_quantity_expectation'] = $user->user_id;
+                    $data['date_forward_quantity_expectation'] = $time;
+                    Query_helper::update($this->config->item('table_bms_hom_forward'),$data,array("id = ".$result['id']));
+                }
             }
             else
             {
-                $data=array();
-                $data['status_forward_quantity_expectation']=$this->config->item('system_status_yes');
-                $data['user_forward_quantity_expectation'] = $user->user_id;
-                $data['date_forward_quantity_expectation'] = $time;
-                Query_helper::update($this->config->item('table_bms_hom_forward'),$data,array("id = ".$result['id']));
+                $ajax['status']=true;
+                $ajax['system_message']='HOM Budget Not Forwarded Yet!';
+                $this->json_return($ajax);
             }
-        }
-        else
+        }else
         {
             $ajax['status']=true;
-            $ajax['system_message']='HOM Budget Not Forwarded Yet!';
+            $ajax['system_message']='Quantity Expectation Not Done Yet';
             $this->json_return($ajax);
         }
+
         $this->db->trans_complete();   //DB Transaction Handle END
         if ($this->db->trans_status() === TRUE)
         {
