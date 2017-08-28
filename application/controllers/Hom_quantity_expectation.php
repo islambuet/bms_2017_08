@@ -112,6 +112,7 @@ class Hom_quantity_expectation extends Root_Controller
         $data['quantity_expectation_info']['user_quantity_expected']='N/A';
         $data['quantity_expectation_info']['date_forward_quantity_expectation']='N/A';
         $data['quantity_expectation_info']['user_forward_quantity_expectation']='N/A';
+        $data['quantity_expectation_info']['status_quantity_expectation']='N/A';
         if($result)
         {
             $data['quantity_expectation_info']['quantity_expected']=$result['quantity_expected'];
