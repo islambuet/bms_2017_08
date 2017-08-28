@@ -22,7 +22,7 @@ if((isset($CI->permissions['action1']) && ($CI->permissions['action1']==1))||(is
             'label'=>$CI->lang->line("ACTION_SAVE"),
             'id'=>'button_action_save_jqx'
         );
-        if($quantity_expectation_info['quantity_expected']>0)
+        if($quantity_expectation_info['status_quantity_expectation']=='Not Forwarded')
         {
             $action_buttons[]=array(
                 'type'=>'button',
