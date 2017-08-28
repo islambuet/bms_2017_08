@@ -20,22 +20,26 @@ else
         'label'=>$CI->lang->line("ACTION_SAVE"),
         'id'=>'button_action_save_jqx'
     );
+    if($quantity_expectation_info['quantity_expected']>0)
+    {
+        $action_buttons[]=array(
+            'type'=>'button',
+            'label'=>$CI->lang->line("ACTION_FORWARD"),
+            'id'=>'button_action_forward'
+        );
+    }
 }
-if((isset($CI->permissions['action1']) && ($CI->permissions['action1']==1))||(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))||(isset($CI->permissions['action3']) && ($CI->permissions['action3']==1)))
-{
-    $action_buttons[]=array(
-        'type'=>'button',
-        'label'=>$CI->lang->line("ACTION_FORWARD"),
-        'id'=>'button_action_forward'
-    );
-}
-if(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))
-{
-    $action_buttons[]=array(
-        'label'=>$CI->lang->line("ACTION_DETAILS"),
-        'href'=>site_url($CI->controller_url.'/index/details/'.$options['year_id'].'/'.$options['crop_type_id'])
-    );
-}
+//if((isset($CI->permissions['action1']) && ($CI->permissions['action1']==1))||(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))||(isset($CI->permissions['action3']) && ($CI->permissions['action3']==1)))
+//{
+//    if($quantity_expectation_info['status_quantity_expectation']=='Not Forwarded')
+//    {
+//        $action_buttons[]=array(
+//            'type'=>'button',
+//            'label'=>$CI->lang->line("ACTION_FORWARD"),
+//            'id'=>'button_action_forward'
+//        );
+//    }
+//}
 if(isset($CI->permissions['action4']) && ($CI->permissions['action4']==1))
 {
     $action_buttons[]=array(
@@ -55,11 +59,6 @@ if(isset($CI->permissions['action5']) && ($CI->permissions['action5']==1))
         'data-title'=>"Download"
     );
 }
-$action_buttons[]=array(
-    'label'=>$CI->lang->line("ACTION_BACK"),
-    'href'=>site_url($CI->controller_url.'/index/search')
-
-);
 $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 ?>
 <form class="form_valid" id="save_form_jqx" action="<?php echo site_url($CI->controller_url.'/index/save');?>" method="post">
@@ -143,6 +142,33 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 $("#save_form_jqx").submit();
             }
         });
+
+        $(document).off('click', '#button_action_forward');
+        $(document).on("click", "#button_action_forward", function(event)
+        {
+//            alert('hi');
+            var sure = confirm('Are Your Sure to Forward?');
+            if(sure)
+            {
+                $.ajax({
+                    url: '<?php echo site_url($CI->controller_url.'/index/forward');?>',
+                    type: 'POST',
+                    datatype: "JSON",
+                    data:{year_id:'<?php echo $options['year_id'];?>',crop_type_id:'<?php echo $options['crop_type_id'];?>'},
+                    success: function (data, status)
+                    {
+
+                    },
+                    error: function (xhr, desc, err)
+                    {
+                        console.log("error");
+
+                    }
+                });
+            }
+
+        });
+
         var url = "<?php echo site_url($CI->controller_url.'/index/get_edit_items');?>";
 
         // prepare the data
