@@ -143,14 +143,14 @@ class Setup_bud_stock_minimum extends Root_Controller
         }
         else
         {
-            $variety=Query_helper::get_info($this->config->item('table_bms_setup_bud_stock_minimum'),'*',array('variety_id='.$id),1);
+            $old_item=Query_helper::get_info($this->config->item('table_bms_setup_bud_stock_minimum'),'*',array('variety_id='.$id),1);
             
             $data=$this->input->post('item');
 
             $this->db->trans_start();
-            if($variety)
+            if($old_item)
             {
-                if($variety['quantity']!=$data['quantity'])
+                if($old_item['quantity']!=$data['quantity'])
                 {
                     $this->db->where('variety_id',$id);
                     $this->db->set('revision', 'revision+1', FALSE);
