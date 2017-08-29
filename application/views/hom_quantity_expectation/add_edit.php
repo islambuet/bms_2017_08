@@ -121,13 +121,10 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             var data=$('#system_jqx_container').jqxGrid('getrows');
             for(var i=0;i<data.length;i++)
             {
-                if(data[i]['quantity_expected_editable'])
-                {
-                    $('#save_form_jqx #jqx_inputs').append('<input type="hidden" name="items['+data[i]['variety_id']+'][stock_warehouse]" value="'+data[i]['stock_warehouse']+'">');
-                    $('#save_form_jqx #jqx_inputs').append('<input type="hidden" name="items['+data[i]['variety_id']+'][stock_outlet]" value="'+data[i]['stock_outlet']+'">');
-                    $('#save_form_jqx #jqx_inputs').append('<input type="hidden" name="items['+data[i]['variety_id']+'][stock_minimum]" value="'+data[i]['stock_minimum']+'">');
-                    $('#save_form_jqx #jqx_inputs').append('<input type="hidden" name="items['+data[i]['variety_id']+'][quantity_expected]" value="'+data[i]['quantity_expected']+'">');
-                }
+                $('#save_form_jqx #jqx_inputs').append('<input type="hidden" name="items['+data[i]['variety_id']+'][stock_warehouse]" value="'+data[i]['stock_warehouse']+'">');
+                $('#save_form_jqx #jqx_inputs').append('<input type="hidden" name="items['+data[i]['variety_id']+'][stock_outlet]" value="'+data[i]['stock_outlet']+'">');
+                $('#save_form_jqx #jqx_inputs').append('<input type="hidden" name="items['+data[i]['variety_id']+'][stock_minimum]" value="'+data[i]['stock_minimum']+'">');
+                $('#save_form_jqx #jqx_inputs').append('<input type="hidden" name="items['+data[i]['variety_id']+'][quantity_expected]" value="'+data[i]['quantity_expected']+'">');
             }
             var sure = confirm('<?php echo $CI->lang->line('MSG_CONFIRM_SAVE'); ?>');
             if(sure)
@@ -219,15 +216,16 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                     { text: 'Total Stock',dataField: 'stock_total',width:'130',cellsrenderer: cellsrenderer,align:'center',cellsAlign:'right',editable:false},
                     { text: 'Minimum Stock',dataField: 'stock_minimum',width:'130',cellsrenderer: cellsrenderer,align:'center',cellsAlign:'right',editable:false},
                     {
-                        text: 'Quantity Expectation',dataField: 'quantity_expected',width:'100',cellsrenderer: cellsrenderer,align:'center',cellsAlign:'right',editable:true,columntype:'custom',
+                        text: 'Quantity Expectation',dataField: 'quantity_expected',width:'100',cellsrenderer: cellsrenderer,align:'center',cellsAlign:'right',columntype:'custom',
                         cellbeginedit: function (row)
                         {
+
                             var selectedRowData = $('#system_jqx_container').jqxGrid('getrowdata', row);
-                            return selectedRowData['quantity_expectation_editable'];
+                            return selectedRowData['quantity_expected_editable'];
                         },
                         initeditor: function (row, cellvalue, editor, celltext, pressedkey) {
 
-                            editor.html('<div style="margin: 0px;width: 100%;height: 100%;padding: 5px;"><input type="text" value="'+cellvalue+'" class="jqxgrid_input integer_type_all"><div>');
+                            editor.html('<div style="margin: 0px;width: 100%;height: 100%;padding: 5px;"><input type="text" value="'+cellvalue+'" class="jqxgrid_input float_type_positive"><div>');
                         },
                         geteditorvalue: function (row, cellvalue, editor) {
                             // return the editor's value.
