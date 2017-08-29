@@ -136,13 +136,12 @@ class Hom_quantity_expectation extends Root_Controller
                 $data['quantity_expectation_info']['status_quantity_expectation']='Forwarded';
                 $data['quantity_expectation_info']['date_forward']=System_helper::display_date_time($result['date_forward_quantity_expectation']);
             }
-            else
+            elseif($result['revision_quantity_expected']!=0)
             {
                 $data['quantity_expectation_info']['status_quantity_expectation']='Not Forwarded';
             }
             $data['quantity_expectation_info']['date_quantity_expected']=System_helper::display_date_time($result['date_quantity_expected']);
         }
-
         $data['title']='HOM Budget';
         $data['years_previous']=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id <'.$reports['year_id']),$this->config->item('num_year_previous_sell'),0,array('id DESC'));
         $data['year_current']=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id ='.$reports['year_id']),1,0,array('id ASC'));
@@ -314,9 +313,27 @@ class Hom_quantity_expectation extends Root_Controller
             $items=$this->input->post('items');
             $forwarded=false;
             $result=Query_helper::get_info($this->config->item('table_bms_hom_forward'),'*',array('year_id ='.$year_id,'crop_type_id ='.$crop_type_id),1);
-            if($result && $result['status_forward_quantity_expectation']==$this->config->item('system_status_yes'))
+
+            if($result)
             {
-                $forwarded=true;
+                if($result['status_forward_budget']!=$this->config->item('system_status_yes'))
+                {
+                    $ajax['status']=false;
+                    $ajax['system_message']='HOM Budget Not Forwarded Yet';
+                    $this->json_return($ajax);
+                    die();
+                }
+                if($result['status_forward_quantity_expectation']==$this->config->item('system_status_yes'))
+                {
+                    $forwarded=true;
+                }
+            }
+            else
+            {
+                $ajax['status']=false;
+                $ajax['system_message']='HOM Budget Not Forwarded Yet';
+                $this->json_return($ajax);
+                die();
             }
 
             //getting current year data
