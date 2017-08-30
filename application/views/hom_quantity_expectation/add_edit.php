@@ -30,7 +30,6 @@ if((isset($CI->permissions['action1']) && ($CI->permissions['action1']==1))||(is
                 'id'=>'button_action_forward'
             );
         }
-
     }
 }
 if(isset($CI->permissions['action4']) && ($CI->permissions['action4']==1))

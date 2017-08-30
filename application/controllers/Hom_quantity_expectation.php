@@ -153,7 +153,6 @@ class Hom_quantity_expectation extends Root_Controller
             $ajax['system_message']=$this->message;
         }
         $this->json_return($ajax);
-
     }
     private function system_get_edit_items()
     {
@@ -385,8 +384,16 @@ class Hom_quantity_expectation extends Root_Controller
                             $this->db->update($this->config->item('table_bms_hom_budget_hom'));
                         }
                     }
+                    elseif($items_current[$variety_id]['quantity_expected']==$item['quantity_expected'] && $items_current[$variety_id]['revision_quantity_expected']==0)
+                    {
+                        $this->db->where('id',$items_current[$variety_id]['id']);
+                        $this->db->set('revision_quantity_expected','revision_quantity_expected+1',false);
+                        $this->db->set('quantity_expected',$item['quantity_expected']);
+                        $this->db->set('date_quantity_expected',$time);
+                        $this->db->set('user_quantity_expected',$user->user_id);
+                        $this->db->update($this->config->item('table_bms_hom_budget_hom'));
+                    }
                 }
-
             }
             $this->db->trans_complete();   //DB Transaction Handle END
             if ($this->db->trans_status() === TRUE)
@@ -417,44 +424,35 @@ class Hom_quantity_expectation extends Root_Controller
         $time=time();
         $year_id=$this->input->post('year_id');
         $crop_type_id=$this->input->post('crop_type_id');
-        $forwarded=false;
-        $result=Query_helper::get_info($this->config->item('table_bms_hom_forward'),array('status_forward_budget'),array('year_id ='.$year_id,'crop_type_id ='.$crop_type_id),1);
-        if($result && $result['status_forward_budget']==$this->config->item('system_status_yes'))
-        {
-            $forwarded=true;
-        }
-        if($forwarded)
+        $result=Query_helper::get_info($this->config->item('table_bms_hom_forward'),array('id,status_forward_budget,status_forward_quantity_expectation'),array('year_id ='.$year_id,'crop_type_id ='.$crop_type_id),1);
+        if($result && $result['status_forward_quantity_expectation']==$this->config->item('system_status_yes'))
         {
             $ajax['status']=true;
             $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>'');
-            $ajax['system_message']="This Budget already Forwarded";
+            $ajax['system_message']="Expected Quantity Budget already Forwarded";
             $this->json_return($ajax);
         }
-        else if((isset($this->permissions['action1']) && ($this->permissions['action1']==1))||(isset($this->permissions['action2']) && ($this->permissions['action2']==1))||(isset($this->permissions['action3']) && ($this->permissions['action3']==1)))
+        elseif($result && $result['status_forward_quantity_expectation']!=$this->config->item('system_status_yes'))
         {
-            if($result)//not possible
+            if((isset($this->permissions['action1']) && ($this->permissions['action1']==1))||(isset($this->permissions['action2']) && ($this->permissions['action2']==1))||(isset($this->permissions['action3']) && ($this->permissions['action3']==1)))
             {
                 $data=array();
-                $data['status_forward_budget']=$this->config->item('system_status_yes');
-                $data['date_forward_budget'] = $time;
-                $data['user_forward_budget'] = $user->user_id;
+                $data['status_forward_quantity_expectation']=$this->config->item('system_status_yes');
+                $data['date_forward_quantity_expectation'] = $time;
+                $data['user_forward_quantity_expectation'] = $user->user_id;
                 Query_helper::update($this->config->item('table_bms_hom_forward'),$data,array('id='.$result['id']));
+                $ajax['status']=true;
+                $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>'');
+                $ajax['system_message']="Expected Quantity Forwarded Successfully";
+                $this->json_return($ajax);
             }
             else
             {
-                $data=array();
-                $data['year_id']=$year_id;
-                $data['crop_type_id']=$crop_type_id;
-                $data['status_forward_budget']=$this->config->item('system_status_yes');
-                $data['date_forward_budget'] = $time;
-                $data['user_forward_budget'] = $user->user_id;
-                Query_helper::add($this->config->item('table_bms_hom_forward'),$data,false);
+                $ajax['status']=false;
+                $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>'');
+                $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
+                $this->json_return($ajax);
             }
-            $ajax['status']=true;
-            $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>'');
-            $ajax['system_message']=$this->lang->line("MSG_SAVED_SUCCESS");
-            $this->json_return($ajax);
-
         }
         else
         {
