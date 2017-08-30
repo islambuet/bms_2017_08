@@ -114,7 +114,10 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
         {
             if($(this).is(':checked'))
             {
-                $('.task_action_'+$(this).attr('data-id')).prop('checked',true);
+                var class_text='.task_action';
+                var data_id=$(this).attr('data-id');
+                $(class_text+'_'+data_id).prop('checked',true);
+                $(class_text+'_'+data_id+class_text+'3').prop('checked',false);
             }
             else
             {
