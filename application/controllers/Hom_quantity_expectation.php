@@ -96,7 +96,6 @@ class Hom_quantity_expectation extends Root_Controller
         $this->db->join($this->config->item('table_bms_hom_forward').' forward','forward.year_id = '.$reports['year_id'].' and forward.crop_type_id = '.$reports['crop_type_id'],'LEFT');
         $this->db->order_by('bud.revision_quantity_expected','DESC');
         $result=$this->db->get()->row_array();
-        //print_r($result);exit;
         $data['quantity_expectation_info']['status_quantity_expectation']='Not Done';
         $data['quantity_expectation_info']['date_quantity_expected']='N/A';
         $data['quantity_expectation_info']['user_quantity_expected']='N/A';
@@ -104,7 +103,6 @@ class Hom_quantity_expectation extends Root_Controller
         $data['quantity_expectation_info']['user_forward_quantity_expectation']='N/A';
         if($result)
         {
-            //$data['budget_info']=$result;
             if($result['user_updated_quantity_expected']>0)
             {
                 $result['user_quantity_expected']=$result['user_updated_quantity_expected'];
@@ -134,13 +132,14 @@ class Hom_quantity_expectation extends Root_Controller
             if($result['status_forward_quantity_expectation']&& $result['status_forward_quantity_expectation']==$this->config->item('system_status_yes'))
             {
                 $data['quantity_expectation_info']['status_quantity_expectation']='Forwarded';
-                $data['quantity_expectation_info']['date_forward']=System_helper::display_date_time($result['date_forward_quantity_expectation']);
+                $data['quantity_expectation_info']['date_forward_quantity_expectation']=System_helper::display_date_time($result['date_forward_quantity_expectation']);
+                $data['quantity_expectation_info']['date_quantity_expected']=System_helper::display_date_time($result['date_quantity_expected']);
             }
             elseif($result['revision_quantity_expected']!=0)
             {
                 $data['quantity_expectation_info']['status_quantity_expectation']='Not Forwarded';
+                $data['quantity_expectation_info']['date_quantity_expected']=System_helper::display_date_time($result['date_quantity_expected']);
             }
-            $data['quantity_expectation_info']['date_quantity_expected']=System_helper::display_date_time($result['date_quantity_expected']);
         }
         $data['title']='HOM Budget';
         $data['years_previous']=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id <'.$reports['year_id']),$this->config->item('num_year_previous_sell'),0,array('id DESC'));
