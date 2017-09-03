@@ -101,8 +101,9 @@ class Hom_quantity_expectation extends Root_Controller
         $data['quantity_expectation_info']['user_quantity_expected']='N/A';
         $data['quantity_expectation_info']['date_forward_quantity_expectation']='N/A';
         $data['quantity_expectation_info']['user_forward_quantity_expectation']='N/A';
-        if($result)
+        if($result && $result['revision_quantity_expected']>0)
         {
+            
             if($result['user_updated_quantity_expected']>0)
             {
                 $result['user_quantity_expected']=$result['user_updated_quantity_expected'];
@@ -117,6 +118,7 @@ class Hom_quantity_expectation extends Root_Controller
             $this->db->from($this->config->item('table_login_setup_user_info').' ui');
             $this->db->select('ui.name,ui.user_id');
             $this->db->where('ui.revision',1);
+            $this->db->where_in('ui.user_id',$user_ids);
             $users=$this->db->get()->result_array();
             foreach($users as $u)
             {
@@ -141,7 +143,7 @@ class Hom_quantity_expectation extends Root_Controller
                 $data['quantity_expectation_info']['date_quantity_expected']=System_helper::display_date_time($result['date_quantity_expected']);
             }
         }
-        $data['title']='HOM Budget';
+        $data['title']='Quantity Expectation';
         $data['years_previous']=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id <'.$reports['year_id']),$this->config->item('num_year_previous_sell'),0,array('id DESC'));
         $data['year_current']=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id ='.$reports['year_id']),1,0,array('id ASC'));
         $data['years_next']=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id >'.$reports['year_id']),$this->config->item('num_year_budget_prediction'),0,array('id ASC'));
@@ -383,15 +385,7 @@ class Hom_quantity_expectation extends Root_Controller
                             $this->db->update($this->config->item('table_bms_hom_budget_hom'));
                         }
                     }
-                    elseif($items_current[$variety_id]['quantity_expected']==$item['quantity_expected'] && $items_current[$variety_id]['revision_quantity_expected']==0)
-                    {
-                        $this->db->where('id',$items_current[$variety_id]['id']);
-                        $this->db->set('revision_quantity_expected','revision_quantity_expected+1',false);
-                        $this->db->set('quantity_expected',$item['quantity_expected']);
-                        $this->db->set('date_quantity_expected',$time);
-                        $this->db->set('user_quantity_expected',$user->user_id);
-                        $this->db->update($this->config->item('table_bms_hom_budget_hom'));
-                    }
+                    //no need to upgrade revision if same quantity
                 }
             }
             $this->db->trans_complete();   //DB Transaction Handle END
@@ -424,41 +418,47 @@ class Hom_quantity_expectation extends Root_Controller
         $year_id=$this->input->post('year_id');
         $crop_type_id=$this->input->post('crop_type_id');
         $result=Query_helper::get_info($this->config->item('table_bms_hom_forward'),array('id,status_forward_budget,status_forward_quantity_expectation'),array('year_id ='.$year_id,'crop_type_id ='.$crop_type_id),1);
-        if($result && $result['status_forward_quantity_expectation']==$this->config->item('system_status_yes'))
+        if($result)
         {
-            $ajax['status']=true;
-            $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>'');
-            $ajax['system_message']="Expected Quantity Budget already Forwarded";
-            $this->json_return($ajax);
-        }
-        elseif($result && $result['status_forward_quantity_expectation']!=$this->config->item('system_status_yes'))
-        {
-            if((isset($this->permissions['action1']) && ($this->permissions['action1']==1))||(isset($this->permissions['action2']) && ($this->permissions['action2']==1))||(isset($this->permissions['action3']) && ($this->permissions['action3']==1)))
+            if($result['status_forward_quantity_expectation']==$this->config->item('system_status_yes'))
             {
-                $data=array();
-                $data['status_forward_quantity_expectation']=$this->config->item('system_status_yes');
-                $data['date_forward_quantity_expectation'] = $time;
-                $data['user_forward_quantity_expectation'] = $user->user_id;
-                Query_helper::update($this->config->item('table_bms_hom_forward'),$data,array('id='.$result['id']));
                 $ajax['status']=true;
                 $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>'');
-                $ajax['system_message']="Expected Quantity Forwarded Successfully";
+                $ajax['system_message']="Expected Quantity Budget already Forwarded";
                 $this->json_return($ajax);
             }
             else
             {
-                $ajax['status']=false;
-                $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>'');
-                $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
-                $this->json_return($ajax);
+                if((isset($this->permissions['action1']) && ($this->permissions['action1']==1))||(isset($this->permissions['action2']) && ($this->permissions['action2']==1))||(isset($this->permissions['action3']) && ($this->permissions['action3']==1)))
+                {
+                    $data=array();
+                    $data['status_forward_quantity_expectation']=$this->config->item('system_status_yes');
+                    $data['date_forward_quantity_expectation'] = $time;
+                    $data['user_forward_quantity_expectation'] = $user->user_id;
+                    Query_helper::update($this->config->item('table_bms_hom_forward'),$data,array('id='.$result['id']));
+                    $ajax['status']=true;
+                    $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>'');
+                    $ajax['system_message']="Expected Quantity Forwarded Successfully";
+                    $this->json_return($ajax);
+                }
+                else
+                {
+                    $ajax['status']=false;
+                    $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>'');
+                    $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
+                    $this->json_return($ajax);
+                }
             }
+
         }
         else
         {
             $ajax['status']=false;
             $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>'');
-            $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
+            $ajax['system_message']="Invalid Access";
             $this->json_return($ajax);
         }
+
+
     }
 }

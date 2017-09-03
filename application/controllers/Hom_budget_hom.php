@@ -151,6 +151,7 @@ class Hom_budget_hom extends Root_Controller
             $this->db->from($this->config->item('table_login_setup_user_info').' ui');
             $this->db->select('ui.name,ui.user_id');
             $this->db->where('ui.revision',1);
+            $this->db->where_in('ui.user_id',$user_ids);
             $users=$this->db->get()->result_array();
             foreach($users as $u)
             {
