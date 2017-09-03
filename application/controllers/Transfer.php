@@ -20,7 +20,7 @@ class Transfer extends CI_Controller {
 	 */
 	public function index()
 	{
-        //$this->hom();
+        $this->min_stock_budget();
 
 	}
     private function ti()
@@ -321,6 +321,20 @@ class Transfer extends CI_Controller {
     {
         $fiscal_year_id=2;//2016-2017
 
+        //final variances
+        $results=Query_helper::get_info('arm_ems.bms_hom_bud_variance','*',array('year0_id ='.$fiscal_year_id));//can filter by crop id to increase runtime
+        $final_variances=array();//hom variance
+        foreach($results as $result)
+        {
+            $final_variances[$result['variety_id']]=$result;
+        }
+        $results=Query_helper::get_info('arm_ems.bms_variety_min_stock','*',array('revision =1'));//only for this crop could be done
+        $min_stocks=array();//min stock
+        foreach($results as $result)
+        {
+            $min_stocks[$result['variety_id']]=$result['quantity'];
+        }
+
         //old_budget
         $this->db->from('arm_ems.bms_hom_bud_hom_bt bud');
         $this->db->select('bud.*');
@@ -344,6 +358,20 @@ class Transfer extends CI_Controller {
             $data['revision_budget']=1;
             $data['date_budgeted']=$result['date_created'];
             $data['user_budgeted']=$result['user_created'];
+            if(isset($final_variances[$data['variety_id']]))
+            {
+                $data['stock_warehouse']=0;
+                $data['stock_outlet']=0;
+                $data['stock_minimum']=0;
+                if(isset($min_stocks[$data['variety_id']]))
+                {
+                    $data['stock_minimum']=$min_stocks[$data['variety_id']];
+                }
+                $data['quantity_expected']=$data['quantity_budget']-$final_variances[$data['variety_id']]['year0_variance_quantity'];
+                $data['revision_quantity_expected']=1;
+                $data['date_quantity_expected']=$final_variances[$data['variety_id']]['date_created'];
+                $data['user_quantity_expected']=$final_variances[$data['variety_id']]['user_created'];
+            }
             $this->db->insert('arm_bms_2017_08.bms_hom_budget_hom',$data);
 
             $data=array();
@@ -389,9 +417,13 @@ class Transfer extends CI_Controller {
                     $data=array();
                     $data['year_id']=$fiscal_year_id;
                     $data['crop_type_id']=$crop_type_id;
-                    $data['status_forward_budget']=$this->config->item('system_status_yes');
+                    $data['status_forward_budget']=$result['status_forward'];
                     $data['date_forward_budget']=$result['date_created'];
                     $data['user_forward_budget']=$result['user_created'];
+
+                    $data['status_forward_quantity_expectation']=$result['status_variance_finalize'];
+                    $data['date_forward_quantity_expectation']=$result['date_variance_finalized'];
+                    $data['user_forward_quantity_expectation']=$result['user_variance_finalized'];
                     $this->db->insert('arm_bms_2017_08.bms_hom_forward',$data);
                 }
 
@@ -400,12 +432,38 @@ class Transfer extends CI_Controller {
         $this->db->trans_complete();   //DB Transaction Handle END
         if ($this->db->trans_status() === TRUE)
         {
-            echo 'Transfer completed';
+            echo 'Hom Transfer completed';
 
         }
         else
         {
-            echo 'Transfer finished';
+            echo 'Hom Transfer failed';
+        }
+
+    }
+    private function min_stock_budget()
+    {
+        $results=Query_helper::get_info('arm_ems.bms_variety_min_stock','*',array('revision =1'),0,0,array('variety_id ASC'));
+        $this->db->trans_start();  //DB Transaction Handle START
+        foreach($results as $result)
+        {
+            $data=array();
+            $data['variety_id']=$result['variety_id'];
+            $data['quantity']=$result['quantity']?$result['quantity']:0;
+            $data['revision']=1;
+            $data['date_created']=$result['date_created'];
+            $data['user_created']=$result['user_created'];
+            $this->db->insert('arm_bms_2017_08.bms_setup_bud_stock_minimum',$data);
+        }
+        $this->db->trans_complete();   //DB Transaction Handle END
+        if ($this->db->trans_status() === TRUE)
+        {
+            echo 'Min Transfer completed';
+
+        }
+        else
+        {
+            echo 'Min Transfer failed';
         }
 
     }
