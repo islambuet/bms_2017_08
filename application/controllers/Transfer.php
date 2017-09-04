@@ -20,7 +20,7 @@ class Transfer extends CI_Controller {
 	 */
 	public function index()
 	{
-        $this->min_stock_budget();
+        //$this->hom();
 
 	}
     private function ti()
@@ -317,18 +317,31 @@ class Transfer extends CI_Controller {
         }
 
     }
+    //required variety,crop type and crop tables
     private function hom()
     {
+        $time=time();
+        $source_tables=array(
+            'hom_bud_variance'=>'arm_ems.bms_hom_bud_variance',
+            'variety_min_stock'=>'arm_ems.bms_variety_min_stock',
+            'hom_bud'=>'arm_ems.bms_hom_bud_hom_bt',
+            'hom_forward'=>'arm_ems.bms_forward_hom'
+        );
+        $destination_tables=array(
+            'hom_bud'=>$this->config->item('table_bms_hom_budget_hom'),
+            'hom_forward'=>$this->config->item('table_bms_hom_forward'),
+        );
+
         $fiscal_year_id=2;//2016-2017
 
         //final variances
-        $results=Query_helper::get_info('arm_ems.bms_hom_bud_variance','*',array('year0_id ='.$fiscal_year_id));//can filter by crop id to increase runtime
+        $results=Query_helper::get_info($source_tables['hom_bud_variance'],'*',array('year0_id ='.$fiscal_year_id));//can filter by crop id to increase runtime
         $final_variances=array();//hom variance
         foreach($results as $result)
         {
             $final_variances[$result['variety_id']]=$result;
         }
-        $results=Query_helper::get_info('arm_ems.bms_variety_min_stock','*',array('revision =1'));//only for this crop could be done
+        $results=Query_helper::get_info($source_tables['variety_min_stock'],'*',array('revision =1'));//only for this crop could be done
         $min_stocks=array();//min stock
         foreach($results as $result)
         {
@@ -336,7 +349,7 @@ class Transfer extends CI_Controller {
         }
 
         //old_budget
-        $this->db->from('arm_ems.bms_hom_bud_hom_bt bud');
+        $this->db->from($source_tables['hom_bud'].' bud');
         $this->db->select('bud.*');
         $this->db->select('ct.id crop_type_id,ct.crop_id crop_id');
         $this->db->join($this->config->item('table_login_setup_classification_varieties').' v','v.id = bud.variety_id','INNER');
@@ -372,7 +385,11 @@ class Transfer extends CI_Controller {
                 $data['date_quantity_expected']=$final_variances[$data['variety_id']]['date_created'];
                 $data['user_quantity_expected']=$final_variances[$data['variety_id']]['user_created'];
             }
-            $this->db->insert('arm_bms_2017_08.bms_hom_budget_hom',$data);
+            $data['quantity_target']=$result['year0_target_quantity']?$result['year0_target_quantity']:0;
+            $data['revision_target']=1;
+            $data['date_targeted']=$result['date_updated']?$result['date_updated']:$time;
+            $data['user_targeted']=$result['user_updated']?$result['user_updated']:21;
+            $this->db->insert($destination_tables['hom_bud'],$data);
 
             $data=array();
             $data['year_id']=$result['year0_id'];
@@ -382,7 +399,11 @@ class Transfer extends CI_Controller {
             $data['revision_budget']=1;
             $data['date_budgeted']=$result['date_created'];
             $data['user_budgeted']=$result['user_created'];
-            $this->db->insert('arm_bms_2017_08.bms_hom_budget_hom',$data);
+            $data['quantity_target']=$result['year1_target_quantity']?$result['year1_target_quantity']:0;
+            $data['revision_target']=1;
+            $data['date_targeted']=$result['date_updated']?$result['date_updated']:$time;
+            $data['user_targeted']=$result['user_updated']?$result['user_updated']:21;
+            $this->db->insert($destination_tables['hom_bud'],$data);
 
             $data=array();
             $data['year_id']=$result['year0_id'];
@@ -392,7 +413,11 @@ class Transfer extends CI_Controller {
             $data['revision_budget']=1;
             $data['date_budgeted']=$result['date_created'];
             $data['user_budgeted']=$result['user_created'];
-            $this->db->insert('arm_bms_2017_08.bms_hom_budget_hom',$data);
+            $data['quantity_target']=$result['year2_target_quantity']?$result['year2_target_quantity']:0;
+            $data['revision_target']=1;
+            $data['date_targeted']=$result['date_updated']?$result['date_updated']:$time;
+            $data['user_targeted']=$result['user_updated']?$result['user_updated']:21;
+            $this->db->insert($destination_tables['hom_bud'],$data);
 
             $data=array();
             $data['year_id']=$result['year0_id'];
@@ -402,12 +427,17 @@ class Transfer extends CI_Controller {
             $data['revision_budget']=1;
             $data['date_budgeted']=$result['date_created'];
             $data['user_budgeted']=$result['user_created'];
-            $this->db->insert('arm_bms_2017_08.bms_hom_budget_hom',$data);
+            $data['quantity_target']=$result['year3_target_quantity']?$result['year3_target_quantity']:0;
+            $data['revision_target']=1;
+            $data['date_targeted']=$result['date_updated']?$result['date_updated']:$time;
+            $data['user_targeted']=$result['user_updated']?$result['user_updated']:21;
+            $this->db->insert($destination_tables['hom_bud'],$data);
+
             $budget_crop_types[$result['crop_id']][$result['crop_type_id']]=$result['crop_type_id'];
 
 
         }
-        $results=Query_helper::get_info('arm_ems.bms_forward_hom','*',array('status_forward ="'.$this->config->item('system_status_yes').'"','year0_id ='.$fiscal_year_id),0,0,array('crop_id'));
+        $results=Query_helper::get_info($source_tables['hom_forward'],'*',array('status_forward ="'.$this->config->item('system_status_yes').'"','year0_id ='.$fiscal_year_id),0,0,array('crop_id'));
         foreach($results as $result)
         {
             if(isset($budget_crop_types[$result['crop_id']]))
@@ -424,7 +454,16 @@ class Transfer extends CI_Controller {
                     $data['status_forward_quantity_expectation']=$result['status_variance_finalize'];
                     $data['date_forward_quantity_expectation']=$result['date_variance_finalized'];
                     $data['user_forward_quantity_expectation']=$result['user_variance_finalized'];
-                    $this->db->insert('arm_bms_2017_08.bms_hom_forward',$data);
+
+                    $data['status_forward_target']=$result['status_target_finalize'];
+                    $data['date_forward_target']=$result['date_target_finalized'];
+                    $data['user_forward_target']=$result['user_target_finalized'];
+
+                    $data['status_forward_assign_target']=$result['status_assign'];
+                    $data['date_forward_assign_target']=$result['date_assigned'];
+                    $data['user_forward_assign_target']=$result['user_assigned'];
+
+                    $this->db->insert($destination_tables['hom_forward'],$data);
                 }
 
             }
@@ -443,7 +482,13 @@ class Transfer extends CI_Controller {
     }
     private function min_stock_budget()
     {
-        $results=Query_helper::get_info('arm_ems.bms_variety_min_stock','*',array('revision =1'),0,0,array('variety_id ASC'));
+        $source_tables=array(
+            'bud_stock_minimum'=>'arm_ems.bms_variety_min_stock'
+        );
+        $destination_tables=array(
+            'bud_stock_minimum'=>$this->config->item('table_bms_setup_bud_stock_minimum')
+        );
+        $results=Query_helper::get_info($source_tables['bud_stock_minimum'],'*',array('revision =1'),0,0,array('variety_id ASC'));
         $this->db->trans_start();  //DB Transaction Handle START
         foreach($results as $result)
         {
@@ -453,7 +498,7 @@ class Transfer extends CI_Controller {
             $data['revision']=1;
             $data['date_created']=$result['date_created'];
             $data['user_created']=$result['user_created'];
-            $this->db->insert('arm_bms_2017_08.bms_setup_bud_stock_minimum',$data);
+            $this->db->insert($destination_tables['bud_stock_minimum'],$data);
         }
         $this->db->trans_complete();   //DB Transaction Handle END
         if ($this->db->trans_status() === TRUE)
