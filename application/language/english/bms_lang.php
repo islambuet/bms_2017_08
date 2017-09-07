@@ -80,6 +80,7 @@ $lang['MSG_FILE_TYPE_ERROR']='File Type Error';
 $lang['LABEL_YEAR'] = 'Year';
 $lang['LABEL_FISCAL_YEAR'] = 'Fiscal Year';
 $lang['LABEL_BUDGETED_YEAR'] = 'Budgeting Year';
+$lang['LABEL_TARGETED_YEAR'] = 'Targeting Year';
 $lang['LABEL_NEXT_YEARS'] = 'Next Years';
 $lang['LABEL_PREVIOUS_YEARS'] = 'Previous Years';
 
