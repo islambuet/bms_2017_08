@@ -489,7 +489,7 @@ class Hom_target_finalize_hom extends Root_Controller
         $year_id=$this->input->post('year_id');
         $crop_type_id=$this->input->post('crop_type_id');
         $forwarded=false;
-        $result=Query_helper::get_info($this->config->item('table_bms_hom_forward'),array('status_forward_target'),array('year_id ='.$year_id,'crop_type_id ='.$crop_type_id),1);
+        $result=Query_helper::get_info($this->config->item('table_bms_hom_forward'),array('id','status_forward_target'),array('year_id ='.$year_id,'crop_type_id ='.$crop_type_id),1);
         if($result && $result['status_forward_target']==$this->config->item('system_status_yes'))
         {
             $forwarded=true;
