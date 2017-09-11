@@ -25,10 +25,18 @@ class Transfer extends CI_Controller {
 	}
     private function ti()
     {
+        $source_tables=array(
+            'budget'=>'arm_ems.bms_ti_bud_ti_bt',
+            'forward'=>'arm_ems.bms_forward_ti'
+        );
+        $destination_tables=array(
+            'budget'=>$this->config->item('table_bms_ti_budget_ti'),
+            'forward'=>$this->config->item('table_bms_ti_forward'),
+        );
         $fiscal_year_id=2;//2016-2017
 
         //old_budget
-        $this->db->from('arm_ems.bms_ti_bud_ti_bt bud');
+        $this->db->from($source_tables['budget'].' bud');
         $this->db->select('bud.*');
         $this->db->select('ct.id crop_type_id,ct.crop_id crop_id');
         $this->db->join($this->config->item('table_login_setup_classification_varieties').' v','v.id = bud.variety_id','INNER');
@@ -49,10 +57,14 @@ class Transfer extends CI_Controller {
             $data['variety_id']=$result['variety_id'];
             $data['year_index']=0;
             $data['quantity_budget']=$result['year0_budget_quantity']?$result['year0_budget_quantity']:0;
-            $data['revision_budget']=1;
+            $data['revision_budget']=($data['quantity_budget']==0)?0:1;
             $data['date_budgeted']=$result['date_created'];
             $data['user_budgeted']=$result['user_created'];
-            $this->db->insert('arm_bms_2017_08.bms_ti_budget_ti',$data);
+            $data['quantity_target']=$result['year0_target_quantity']?$result['year0_target_quantity']:0;
+            $data['revision_target']=($data['quantity_target']==0)?0:1;
+            $data['date_targeted']=$result['date_targeted'];
+            $data['user_targeted']=$result['user_targeted'];
+            $this->db->insert($destination_tables['budget'],$data);
 
             $data=array();
             $data['year_id']=$result['year0_id'];
@@ -60,10 +72,14 @@ class Transfer extends CI_Controller {
             $data['variety_id']=$result['variety_id'];
             $data['year_index']=1;
             $data['quantity_budget']=$result['year1_budget_quantity']?$result['year1_budget_quantity']:0;
-            $data['revision_budget']=1;
+            $data['revision_budget']=($data['quantity_budget']==0)?0:1;
             $data['date_budgeted']=$result['date_created'];
             $data['user_budgeted']=$result['user_created'];
-            $this->db->insert('arm_bms_2017_08.bms_ti_budget_ti',$data);
+            $data['quantity_target']=$result['year1_target_quantity']?$result['year1_target_quantity']:0;
+            $data['revision_target']=($data['quantity_target']==0)?0:1;
+            $data['date_targeted']=$result['date_targeted'];
+            $data['user_targeted']=$result['user_targeted'];
+            $this->db->insert($destination_tables['budget'],$data);
 
             $data=array();
             $data['year_id']=$result['year0_id'];
@@ -71,10 +87,14 @@ class Transfer extends CI_Controller {
             $data['variety_id']=$result['variety_id'];
             $data['year_index']=2;
             $data['quantity_budget']=$result['year2_budget_quantity']?$result['year2_budget_quantity']:0;
-            $data['revision_budget']=1;
+            $data['revision_budget']=($data['quantity_budget']==0)?0:1;
             $data['date_budgeted']=$result['date_created'];
             $data['user_budgeted']=$result['user_created'];
-            $this->db->insert('arm_bms_2017_08.bms_ti_budget_ti',$data);
+            $data['quantity_target']=$result['year2_target_quantity']?$result['year2_target_quantity']:0;
+            $data['revision_target']=($data['quantity_target']==0)?0:1;
+            $data['date_targeted']=$result['date_targeted'];
+            $data['user_targeted']=$result['user_targeted'];
+            $this->db->insert($destination_tables['budget'],$data);
 
             $data=array();
             $data['year_id']=$result['year0_id'];
@@ -82,15 +102,19 @@ class Transfer extends CI_Controller {
             $data['variety_id']=$result['variety_id'];
             $data['year_index']=3;
             $data['quantity_budget']=$result['year3_budget_quantity']?$result['year3_budget_quantity']:0;
-            $data['revision_budget']=1;
+            $data['revision_budget']=($data['quantity_budget']==0)?0:1;
             $data['date_budgeted']=$result['date_created'];
             $data['user_budgeted']=$result['user_created'];
-            $this->db->insert('arm_bms_2017_08.bms_ti_budget_ti',$data);
+            $data['quantity_target']=$result['year3_target_quantity']?$result['year3_target_quantity']:0;
+            $data['revision_target']=($data['quantity_target']==0)?0:1;
+            $data['date_targeted']=$result['date_targeted'];
+            $data['user_targeted']=$result['user_targeted'];
+            $this->db->insert($destination_tables['budget'],$data);
             $budget_crop_types[$result['territory_id']][$result['crop_id']][$result['crop_type_id']]=$result['crop_type_id'];
 
 
         }
-        $results=Query_helper::get_info('arm_ems.bms_forward_ti','*',array('status_forward ="'.$this->config->item('system_status_yes').'"','year0_id ='.$fiscal_year_id),0,0,array('territory_id','crop_id'));
+        $results=Query_helper::get_info($source_tables['forward'],'*',array('status_forward ="'.$this->config->item('system_status_yes').'"','year0_id ='.$fiscal_year_id),0,0,array('territory_id','crop_id'));
         foreach($results as $result)
         {
             if(isset($budget_crop_types[$result['territory_id']][$result['crop_id']]))
@@ -104,7 +128,11 @@ class Transfer extends CI_Controller {
                     $data['status_forward_budget']=$this->config->item('system_status_yes');
                     $data['date_forward_budget']=$result['date_created'];
                     $data['user_forward_budget']=$result['user_created'];
-                    $this->db->insert('arm_bms_2017_08.bms_ti_forward',$data);
+                    $data['status_forward_assign_target']=$result['status_assign'];
+                    $data['date_forward_assign_target']=$result['date_assigned'];
+                    $data['user_forward_assign_target']=$result['user_assigned'];
+                    $this->db->insert($destination_tables['forward'],$data);
+
                 }
 
             }
@@ -112,21 +140,30 @@ class Transfer extends CI_Controller {
         $this->db->trans_complete();   //DB Transaction Handle END
         if ($this->db->trans_status() === TRUE)
         {
-            echo 'Transfer completed';
+            echo 'TI Transfer completed';
 
         }
         else
         {
-            echo 'Transfer finished';
+            echo 'TI Transfer Failed';
         }
 
     }
     private function zi()
     {
+        $source_tables=array(
+            'budget'=>'arm_ems.bms_zi_bud_zi_bt',
+            'forward'=>'arm_ems.bms_forward_zi'
+        );
+        $destination_tables=array(
+            'budget'=>$this->config->item('table_bms_zi_budget_zi'),
+            'forward'=>$this->config->item('table_bms_zi_forward'),
+        );
+
         $fiscal_year_id=2;//2016-2017
 
         //old_budget
-        $this->db->from('arm_ems.bms_zi_bud_zi_bt bud');
+        $this->db->from($source_tables['budget'].' bud');
         $this->db->select('bud.*');
         $this->db->select('ct.id crop_type_id,ct.crop_id crop_id');
         $this->db->join($this->config->item('table_login_setup_classification_varieties').' v','v.id = bud.variety_id','INNER');
@@ -147,10 +184,15 @@ class Transfer extends CI_Controller {
             $data['variety_id']=$result['variety_id'];
             $data['year_index']=0;
             $data['quantity_budget']=$result['year0_budget_quantity']?$result['year0_budget_quantity']:0;
-            $data['revision_budget']=1;
+            $data['revision_budget']=($data['quantity_budget']==0)?0:1;
             $data['date_budgeted']=$result['date_created'];
             $data['user_budgeted']=$result['user_created'];
-            $this->db->insert('arm_bms_2017_08.bms_zi_budget_zi',$data);
+            $data['quantity_target']=$result['year0_target_quantity']?$result['year0_target_quantity']:0;
+            $data['revision_target']=($data['quantity_target']==0)?0:1;
+            $data['date_targeted']=$result['date_targeted'];
+            $data['user_targeted']=$result['user_targeted'];
+            $this->db->insert($destination_tables['budget'],$data);
+
 
             $data=array();
             $data['year_id']=$result['year0_id'];
@@ -158,10 +200,14 @@ class Transfer extends CI_Controller {
             $data['variety_id']=$result['variety_id'];
             $data['year_index']=1;
             $data['quantity_budget']=$result['year1_budget_quantity']?$result['year1_budget_quantity']:0;
-            $data['revision_budget']=1;
+            $data['revision_budget']=($data['quantity_budget']==0)?0:1;
             $data['date_budgeted']=$result['date_created'];
             $data['user_budgeted']=$result['user_created'];
-            $this->db->insert('arm_bms_2017_08.bms_zi_budget_zi',$data);
+            $data['quantity_target']=$result['year1_target_quantity']?$result['year1_target_quantity']:0;
+            $data['revision_target']=($data['quantity_target']==0)?0:1;
+            $data['date_targeted']=$result['date_targeted'];
+            $data['user_targeted']=$result['user_targeted'];
+            $this->db->insert($destination_tables['budget'],$data);
 
             $data=array();
             $data['year_id']=$result['year0_id'];
@@ -169,10 +215,14 @@ class Transfer extends CI_Controller {
             $data['variety_id']=$result['variety_id'];
             $data['year_index']=2;
             $data['quantity_budget']=$result['year2_budget_quantity']?$result['year2_budget_quantity']:0;
-            $data['revision_budget']=1;
+            $data['revision_budget']=($data['quantity_budget']==0)?0:1;
             $data['date_budgeted']=$result['date_created'];
             $data['user_budgeted']=$result['user_created'];
-            $this->db->insert('arm_bms_2017_08.bms_zi_budget_zi',$data);
+            $data['quantity_target']=$result['year2_target_quantity']?$result['year2_target_quantity']:0;
+            $data['revision_target']=($data['quantity_target']==0)?0:1;
+            $data['date_targeted']=$result['date_targeted'];
+            $data['user_targeted']=$result['user_targeted'];
+            $this->db->insert($destination_tables['budget'],$data);
 
             $data=array();
             $data['year_id']=$result['year0_id'];
@@ -180,15 +230,19 @@ class Transfer extends CI_Controller {
             $data['variety_id']=$result['variety_id'];
             $data['year_index']=3;
             $data['quantity_budget']=$result['year3_budget_quantity']?$result['year3_budget_quantity']:0;
-            $data['revision_budget']=1;
+            $data['revision_budget']=($data['quantity_budget']==0)?0:1;
             $data['date_budgeted']=$result['date_created'];
             $data['user_budgeted']=$result['user_created'];
-            $this->db->insert('arm_bms_2017_08.bms_zi_budget_zi',$data);
+            $data['quantity_target']=$result['year3_target_quantity']?$result['year3_target_quantity']:0;
+            $data['revision_target']=($data['quantity_target']==0)?0:1;
+            $data['date_targeted']=$result['date_targeted'];
+            $data['user_targeted']=$result['user_targeted'];
+            $this->db->insert($destination_tables['budget'],$data);
             $budget_crop_types[$result['zone_id']][$result['crop_id']][$result['crop_type_id']]=$result['crop_type_id'];
 
 
         }
-        $results=Query_helper::get_info('arm_ems.bms_forward_zi','*',array('status_forward ="'.$this->config->item('system_status_yes').'"','year0_id ='.$fiscal_year_id),0,0,array('zone_id','crop_id'));
+        $results=Query_helper::get_info($source_tables['forward'],'*',array('status_forward ="'.$this->config->item('system_status_yes').'"','year0_id ='.$fiscal_year_id),0,0,array('zone_id','crop_id'));
         foreach($results as $result)
         {
             if(isset($budget_crop_types[$result['zone_id']][$result['crop_id']]))
@@ -202,7 +256,11 @@ class Transfer extends CI_Controller {
                     $data['status_forward_budget']=$this->config->item('system_status_yes');
                     $data['date_forward_budget']=$result['date_created'];
                     $data['user_forward_budget']=$result['user_created'];
-                    $this->db->insert('arm_bms_2017_08.bms_zi_forward',$data);
+
+                    $data['status_forward_assign_target']=$result['status_assign'];
+                    $data['date_forward_assign_target']=$result['date_assigned'];
+                    $data['user_forward_assign_target']=$result['user_assigned'];
+                    $this->db->insert($destination_tables['forward'],$data);
                 }
 
             }
@@ -210,21 +268,30 @@ class Transfer extends CI_Controller {
         $this->db->trans_complete();   //DB Transaction Handle END
         if ($this->db->trans_status() === TRUE)
         {
-            echo 'Transfer completed';
+            echo 'ZI Transfer completed';
 
         }
         else
         {
-            echo 'Transfer finished';
+            echo 'ZI Transfer failed';
         }
 
     }
     private function di()
     {
+        $source_tables=array(
+            'budget'=>'arm_ems.bms_di_bud_di_bt',
+            'forward'=>'arm_ems.bms_forward_di'
+        );
+        $destination_tables=array(
+            'budget'=>$this->config->item('table_bms_di_budget_di'),
+            'forward'=>$this->config->item('table_bms_di_forward'),
+        );
+
         $fiscal_year_id=2;//2016-2017
 
         //old_budget
-        $this->db->from('arm_ems.bms_di_bud_di_bt bud');
+        $this->db->from($source_tables['budget'].' bud');
         $this->db->select('bud.*');
         $this->db->select('ct.id crop_type_id,ct.crop_id crop_id');
         $this->db->join($this->config->item('table_login_setup_classification_varieties').' v','v.id = bud.variety_id','INNER');
@@ -245,10 +312,15 @@ class Transfer extends CI_Controller {
             $data['variety_id']=$result['variety_id'];
             $data['year_index']=0;
             $data['quantity_budget']=$result['year0_budget_quantity']?$result['year0_budget_quantity']:0;
-            $data['revision_budget']=1;
+            $data['revision_budget']=($data['quantity_budget']==0)?0:1;
             $data['date_budgeted']=$result['date_created'];
             $data['user_budgeted']=$result['user_created'];
-            $this->db->insert('arm_bms_2017_08.bms_di_budget_di',$data);
+
+            $data['quantity_target']=$result['year0_target_quantity']?$result['year0_target_quantity']:0;
+            $data['revision_target']=($data['quantity_target']==0)?0:1;
+            $data['date_targeted']=$result['date_targeted'];
+            $data['user_targeted']=$result['user_targeted'];
+            $this->db->insert($destination_tables['budget'],$data);
 
             $data=array();
             $data['year_id']=$result['year0_id'];
@@ -256,10 +328,15 @@ class Transfer extends CI_Controller {
             $data['variety_id']=$result['variety_id'];
             $data['year_index']=1;
             $data['quantity_budget']=$result['year1_budget_quantity']?$result['year1_budget_quantity']:0;
-            $data['revision_budget']=1;
+            $data['revision_budget']=($data['quantity_budget']==0)?0:1;
             $data['date_budgeted']=$result['date_created'];
             $data['user_budgeted']=$result['user_created'];
-            $this->db->insert('arm_bms_2017_08.bms_di_budget_di',$data);
+
+            $data['quantity_target']=$result['year1_target_quantity']?$result['year1_target_quantity']:0;
+            $data['revision_target']=($data['quantity_target']==0)?0:1;
+            $data['date_targeted']=$result['date_targeted'];
+            $data['user_targeted']=$result['user_targeted'];
+            $this->db->insert($destination_tables['budget'],$data);
 
             $data=array();
             $data['year_id']=$result['year0_id'];
@@ -267,10 +344,15 @@ class Transfer extends CI_Controller {
             $data['variety_id']=$result['variety_id'];
             $data['year_index']=2;
             $data['quantity_budget']=$result['year2_budget_quantity']?$result['year2_budget_quantity']:0;
-            $data['revision_budget']=1;
+            $data['revision_budget']=($data['quantity_budget']==0)?0:1;
             $data['date_budgeted']=$result['date_created'];
             $data['user_budgeted']=$result['user_created'];
-            $this->db->insert('arm_bms_2017_08.bms_di_budget_di',$data);
+
+            $data['quantity_target']=$result['year2_target_quantity']?$result['year2_target_quantity']:0;
+            $data['revision_target']=($data['quantity_target']==0)?0:1;
+            $data['date_targeted']=$result['date_targeted'];
+            $data['user_targeted']=$result['user_targeted'];
+            $this->db->insert($destination_tables['budget'],$data);
 
             $data=array();
             $data['year_id']=$result['year0_id'];
@@ -278,15 +360,21 @@ class Transfer extends CI_Controller {
             $data['variety_id']=$result['variety_id'];
             $data['year_index']=3;
             $data['quantity_budget']=$result['year3_budget_quantity']?$result['year3_budget_quantity']:0;
-            $data['revision_budget']=1;
+            $data['revision_budget']=($data['quantity_budget']==0)?0:1;
             $data['date_budgeted']=$result['date_created'];
             $data['user_budgeted']=$result['user_created'];
-            $this->db->insert('arm_bms_2017_08.bms_di_budget_di',$data);
+
+            $data['quantity_target']=$result['year3_target_quantity']?$result['year3_target_quantity']:0;
+            $data['revision_target']=($data['quantity_target']==0)?0:1;
+            $data['date_targeted']=$result['date_targeted'];
+            $data['user_targeted']=$result['user_targeted'];
+            $this->db->insert($destination_tables['budget'],$data);
+
             $budget_crop_types[$result['division_id']][$result['crop_id']][$result['crop_type_id']]=$result['crop_type_id'];
 
 
         }
-        $results=Query_helper::get_info('arm_ems.bms_forward_di','*',array('status_forward ="'.$this->config->item('system_status_yes').'"','year0_id ='.$fiscal_year_id),0,0,array('division_id','crop_id'));
+        $results=Query_helper::get_info($source_tables['forward'],'*',array('status_forward ="'.$this->config->item('system_status_yes').'"','year0_id ='.$fiscal_year_id),0,0,array('division_id','crop_id'));
         foreach($results as $result)
         {
             if(isset($budget_crop_types[$result['division_id']][$result['crop_id']]))
@@ -300,7 +388,11 @@ class Transfer extends CI_Controller {
                     $data['status_forward_budget']=$this->config->item('system_status_yes');
                     $data['date_forward_budget']=$result['date_created'];
                     $data['user_forward_budget']=$result['user_created'];
-                    $this->db->insert('arm_bms_2017_08.bms_di_forward',$data);
+
+                    $data['status_forward_assign_target']=$result['status_assign'];
+                    $data['date_forward_assign_target']=$result['date_assigned'];
+                    $data['user_forward_assign_target']=$result['user_assigned'];
+                    $this->db->insert($destination_tables['forward'],$data);
                 }
 
             }
@@ -308,12 +400,12 @@ class Transfer extends CI_Controller {
         $this->db->trans_complete();   //DB Transaction Handle END
         if ($this->db->trans_status() === TRUE)
         {
-            echo 'Transfer completed';
+            echo 'DI Transfer completed';
 
         }
         else
         {
-            echo 'Transfer finished';
+            echo 'DI Transfer failed';
         }
 
     }
@@ -368,7 +460,7 @@ class Transfer extends CI_Controller {
             $data['variety_id']=$result['variety_id'];
             $data['year_index']=0;
             $data['quantity_budget']=$result['year0_budget_quantity']?$result['year0_budget_quantity']:0;
-            $data['revision_budget']=1;
+            $data['revision_budget']=($data['quantity_budget']==0)?0:1;
             $data['date_budgeted']=$result['date_created'];
             $data['user_budgeted']=$result['user_created'];
             if(isset($final_variances[$data['variety_id']]))
@@ -381,12 +473,12 @@ class Transfer extends CI_Controller {
                     $data['stock_minimum']=$min_stocks[$data['variety_id']];
                 }
                 $data['quantity_expected']=$data['quantity_budget']-$final_variances[$data['variety_id']]['year0_variance_quantity'];
-                $data['revision_quantity_expected']=1;
+                $data['revision_quantity_expected']=($data['quantity_expected']==0)?0:1;
                 $data['date_quantity_expected']=$final_variances[$data['variety_id']]['date_created'];
                 $data['user_quantity_expected']=$final_variances[$data['variety_id']]['user_created'];
             }
             $data['quantity_target']=$result['year0_target_quantity']?$result['year0_target_quantity']:0;
-            $data['revision_target']=1;
+            $data['revision_target']=($data['quantity_target']==0)?0:1;
             $data['date_targeted']=$result['date_updated']?$result['date_updated']:$time;
             $data['user_targeted']=$result['user_updated']?$result['user_updated']:21;
             $this->db->insert($destination_tables['hom_bud'],$data);
@@ -396,11 +488,11 @@ class Transfer extends CI_Controller {
             $data['variety_id']=$result['variety_id'];
             $data['year_index']=1;
             $data['quantity_budget']=$result['year1_budget_quantity']?$result['year1_budget_quantity']:0;
-            $data['revision_budget']=1;
+            $data['revision_budget']=($data['quantity_budget']==0)?0:1;
             $data['date_budgeted']=$result['date_created'];
             $data['user_budgeted']=$result['user_created'];
             $data['quantity_target']=$result['year1_target_quantity']?$result['year1_target_quantity']:0;
-            $data['revision_target']=1;
+            $data['revision_target']=($data['quantity_target']==0)?0:1;
             $data['date_targeted']=$result['date_updated']?$result['date_updated']:$time;
             $data['user_targeted']=$result['user_updated']?$result['user_updated']:21;
             $this->db->insert($destination_tables['hom_bud'],$data);
@@ -410,11 +502,11 @@ class Transfer extends CI_Controller {
             $data['variety_id']=$result['variety_id'];
             $data['year_index']=2;
             $data['quantity_budget']=$result['year2_budget_quantity']?$result['year2_budget_quantity']:0;
-            $data['revision_budget']=1;
+            $data['revision_budget']=($data['quantity_budget']==0)?0:1;
             $data['date_budgeted']=$result['date_created'];
             $data['user_budgeted']=$result['user_created'];
             $data['quantity_target']=$result['year2_target_quantity']?$result['year2_target_quantity']:0;
-            $data['revision_target']=1;
+            $data['revision_target']=($data['quantity_target']==0)?0:1;
             $data['date_targeted']=$result['date_updated']?$result['date_updated']:$time;
             $data['user_targeted']=$result['user_updated']?$result['user_updated']:21;
             $this->db->insert($destination_tables['hom_bud'],$data);
@@ -424,11 +516,11 @@ class Transfer extends CI_Controller {
             $data['variety_id']=$result['variety_id'];
             $data['year_index']=3;
             $data['quantity_budget']=$result['year3_budget_quantity']?$result['year3_budget_quantity']:0;
-            $data['revision_budget']=1;
+            $data['revision_budget']=($data['quantity_budget']==0)?0:1;
             $data['date_budgeted']=$result['date_created'];
             $data['user_budgeted']=$result['user_created'];
             $data['quantity_target']=$result['year3_target_quantity']?$result['year3_target_quantity']:0;
-            $data['revision_target']=1;
+            $data['revision_target']=($data['quantity_target']==0)?0:1;
             $data['date_targeted']=$result['date_updated']?$result['date_updated']:$time;
             $data['user_targeted']=$result['user_updated']?$result['user_updated']:21;
             $this->db->insert($destination_tables['hom_bud'],$data);
