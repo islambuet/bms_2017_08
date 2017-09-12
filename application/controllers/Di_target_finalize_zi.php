@@ -108,12 +108,14 @@ class Di_target_finalize_zi extends Root_Controller
         $this->db->where('zone.division_id',$reports['division_id']);
         $this->db->order_by('zone.ordering','ASC');
         $results=$this->db->get()->result_array();
+        $area_ids=array('0');
         $data['areas']=array();
         $outlet_ids=array('0');
         foreach($results as $result)
         {
             $outlet_ids[]=$result['id'];
             $data['areas'][$result['value']]=$result;
+            $area_ids[]=$result['value'];
         }
         //market survey size
         $this->db->from($this->config->item('table_bms_setup_market_size').' ms');
@@ -128,9 +130,10 @@ class Di_target_finalize_zi extends Root_Controller
         $this->db->select('bud.*');
         $this->db->select('forward.status_forward_assign_target,forward.date_forward_assign_target,forward.user_forward_assign_target');
         $this->db->where('bud.year_id',$reports['year_id']);
+        $this->db->where_in('bud.zone_id',$area_ids);
         $this->db->join($this->config->item('table_login_setup_classification_varieties').' v','v.id = bud.variety_id','INNER');
         $this->db->where('v.crop_type_id',$reports['crop_type_id']);
-        $this->db->join($this->config->item('table_bms_di_forward').' forward','forward.year_id = '.$reports['year_id'].' and forward.crop_type_id = '.$reports['crop_type_id'],'LEFT');
+        $this->db->join($this->config->item('table_bms_di_forward').' forward','forward.year_id = '.$reports['year_id'].' and forward.division_id = '.$reports['division_id'].' and forward.crop_type_id = '.$reports['crop_type_id'],'LEFT');
         $this->db->order_by('bud.revision_target','DESC');
         $result=$this->db->get()->row_array();
         //print_r($result);exit;
