@@ -335,7 +335,6 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                                 { columngroup: 'year<?php echo $i; ?>_area_<?php echo $area['value']; ?>',text: 'Target', dataField: 'year<?php echo $i; ?>_area<?php echo $area['value']; ?>_quantity_target',align:'center',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer,columntype:'custom',
                                     cellbeginedit: function (row) {
                                         var selectedRowData = $('#system_jqx_container').jqxGrid('getrowdata', row);//only last selected
-                                        console.log('<?php echo 'year'.($i).'_area'.($area['value']).'_quantity_target_editable';?>');
                                         return selectedRowData['<?php echo 'year'.($i).'_area'.($area['value']).'_quantity_target_editable';?>'];
                                     },
                                     initeditor: function (row, cellvalue, editor, celltext, pressedkey) {
