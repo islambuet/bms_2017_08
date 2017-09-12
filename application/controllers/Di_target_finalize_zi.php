@@ -87,6 +87,12 @@ class Di_target_finalize_zi extends Root_Controller
             $ajax['system_message']='Please Select a Crop Type';
             $this->json_return($ajax);
         }
+        if(!($reports['division_id']>0))
+        {
+            $ajax['status']=false;
+            $ajax['system_message']='Please Select a Division';
+            $this->json_return($ajax);
+        }
         //get my outlet ids and Zone names
         $this->db->from($this->config->item('table_login_csetup_customer').' outlet');
         $this->db->where('outlet.status',$this->config->item('system_status_active'));
