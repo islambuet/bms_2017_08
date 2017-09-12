@@ -97,13 +97,6 @@ class Hom_target_finalize_hom extends Root_Controller
         $this->db->where('ms.crop_type_id',$reports['crop_type_id']);
         $this->db->where('outlet.status',$this->config->item('system_status_active'));
         $this->db->where('out_info.type',$this->config->item('system_customer_type_outlet_id'));
-        /*
-        $this->db->join($this->config->item('table_login_setup_location_districts').' d','d.id = out_info.district_id','INNER');
-        $this->db->join($this->config->item('table_login_setup_location_territories').' t','t.id = d.territory_id','INNER');
-        $this->db->join($this->config->item('table_login_setup_location_zones').' zone','zone.id = t.zone_id','INNER');
-        $this->db->join($this->config->item('table_login_setup_location_divisions').' division','division.id = zone.division_id','INNER');
-        $this->db->where('division.status',$this->config->item('system_status_active'));
-        */
         $data['market_survey']=$this->db->get()->row_array();
 
         //budget status
