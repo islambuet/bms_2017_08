@@ -166,23 +166,23 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
         ?>
         <div class="col-xs-12" style="margin-bottom: 20px;">
             <div class="col-xs-12" style="margin-bottom: 20px;">
-                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="year0_zi_quantity_budget">ZI Budget (<?php echo $year_current['text']; ?>)</label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="year0_zi_quantity_budget">ZI Budget (<?php echo $year_current['text']; ?>)</label>
                 <?php
                     foreach($areas as $area)
                     {
                         ?>
-                        <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="year0_area<?php echo $area['value']; ?>_quantity_budget"><?php echo $area['text']; ?> Budget (<?php echo $year_current['text']; ?>)</label>
+                        <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="year0_area<?php echo $area['value']; ?>_quantity_budget"><?php echo $area['text']; ?> Budget (<?php echo $year_current['text']; ?>)</label>
                         <?php
                     }
                     for($i=0;$i<sizeof($years_next);$i++)
                     {
                         ?>
-                        <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="year<?php echo ($i+1); ?>_zi_quantity_budget">ZI Budget (<?php echo $years_next[$i]['text']; ?>)</label>
+                        <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="year<?php echo ($i+1); ?>_zi_quantity_budget">ZI Budget (<?php echo $years_next[$i]['text']; ?>)</label>
                         <?php
                         foreach($areas as $area)
                         {
                             ?>
-                            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="year<?php echo ($i+1); ?>_area<?php echo $area['value']; ?>_quantity_budget"><?php echo $area['text']; ?> Budget (<?php echo $years_next[$i]['text']; ?>)</label>
+                            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="year<?php echo ($i+1); ?>_area<?php echo $area['value']; ?>_quantity_budget"><?php echo $area['text']; ?> Budget (<?php echo $years_next[$i]['text']; ?>)</label>
                             <?php
                         }
                     }
@@ -325,13 +325,13 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                         for($i=0;$i<=sizeof($years_next);$i++)
                         {
                             ?>
-                            { columngroup: 'year<?php echo $i; ?>',text: 'ZI Budget', dataField: 'year<?php echo $i; ?>_zi_quantity_budget',align:'center',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer,editable:false},
+                            { columngroup: 'year<?php echo $i; ?>',text: 'ZI Budget', dataField: 'year<?php echo $i; ?>_zi_quantity_budget',align:'center',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer,hidden:true,editable:false},
                             { columngroup: 'year<?php echo $i; ?>',text: 'ZI Target', dataField: 'year<?php echo $i; ?>_zi_quantity_target',align:'center',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer,editable:false},
                             <?php
                             foreach($areas as $area)
                             {
                                 ?>
-                                { columngroup: 'year<?php echo $i; ?>_area_<?php echo $area['value']; ?>',text: 'Budget', dataField: 'year<?php echo $i; ?>_area<?php echo $area['value']; ?>_quantity_budget',align:'center',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer,editable:false},
+                                { columngroup: 'year<?php echo $i; ?>_area_<?php echo $area['value']; ?>',text: 'Budget', dataField: 'year<?php echo $i; ?>_area<?php echo $area['value']; ?>_quantity_budget',align:'center',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer,hidden:true,editable:false},
                                 { columngroup: 'year<?php echo $i; ?>_area_<?php echo $area['value']; ?>',text: 'Target', dataField: 'year<?php echo $i; ?>_area<?php echo $area['value']; ?>_quantity_target',align:'center',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer,columntype:'custom',
                                     cellbeginedit: function (row) {
                                         var selectedRowData = $('#system_jqx_container').jqxGrid('getrowdata', row);//only last selected
