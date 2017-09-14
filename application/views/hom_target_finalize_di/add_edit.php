@@ -169,8 +169,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <?php
                     foreach($areas as $area)
                     {
-                        ?>
-                        <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="year0_area<?php echo $area['value']; ?>_quantity_budget"><?php echo $area['text']; ?> Budget (<?php echo $year_current['text']; ?>)</label>
+                        ?><label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="year0_area<?php echo $area['value']; ?>_quantity_budget"><?php echo $area['text']; ?> Budget (<?php echo $year_current['text']; ?>)</label>
                         <?php
                     }
                     for($i=0;$i<sizeof($years_next);$i++)
@@ -279,6 +278,8 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                             { name: 'year<?php echo $i; ?>_area<?php echo $area['value']; ?>_quantity_budget', type: 'string' },
                             { name: 'year<?php echo $i; ?>_area<?php echo $area['value']; ?>_quantity_target', type: 'string' },
                             { name: 'year<?php echo $i; ?>_area<?php echo $area['value']; ?>_quantity_target_editable', type: 'string' },
+                            { name: 'year<?php echo $i; ?>_area<?php echo $area['value']; ?>_previous_target', type: 'string' },
+                            { name: 'year<?php echo $i; ?>_area<?php echo $area['value']; ?>_previous_prediction_target', type: 'string' },
                             <?php
                         }
                     }
@@ -313,25 +314,27 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 rowsheight: 35,
                 editable:true,
                 columns: [
-                    { text: '<?php echo $CI->lang->line('LABEL_SL_NO'); ?>',pinned:true, dataField: 'sl_no',width:'50',align:'center',cellsAlign:'right',cellsrenderer: cellsrenderer,editable:false},
+                    { text: '<?php echo $CI->lang->line('LABEL_SL_NO'); ?>',pinned:true, dataField: 'sl_no',width:'40',align:'center',cellsAlign:'right',cellsrenderer: cellsrenderer,editable:false},
                     { text: '<?php echo $CI->lang->line('LABEL_VARIETY'); ?>',pinned:true, dataField: 'variety_name',width:'150',align:'center',cellsrenderer: cellsrenderer,editable:false},
                     <?php
                         for($i=0;$i<sizeof($years_previous);$i++)
                         {
                             ?>
-                            {columngroup: 'previous_years',text: '<?php echo $years_previous[$i]['text']; ?>', dataField: '<?php echo 'year'.($i+1).'_sell_quantity';?>',width:'150',align:'center',cellsAlign:'right',cellsrenderer: cellsrenderer,editable:false},
+                            {columngroup: 'previous_years',text: '<?php echo $years_previous[$i]['text']; ?>', dataField: '<?php echo 'year'.($i+1).'_sell_quantity';?>',width:'65',align:'center',cellsAlign:'right',cellsrenderer: cellsrenderer,editable:false},
                             <?php
                         }
                         for($i=0;$i<=sizeof($years_next);$i++)
                         {
                             ?>
-                            { columngroup: 'year<?php echo $i; ?>',text: 'HOM Budget', dataField: 'year<?php echo $i; ?>_hom_quantity_budget',align:'center',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer,hidden:true,editable:false},
-                            { columngroup: 'year<?php echo $i; ?>',text: 'HOM Target', dataField: 'year<?php echo $i; ?>_hom_quantity_target',align:'center',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer,editable:false},
+                            { columngroup: 'year<?php echo $i; ?>',text: 'HOM Budget', dataField: 'year<?php echo $i; ?>_hom_quantity_budget',align:'center',width:'75',cellsAlign:'right',cellsrenderer: cellsrenderer,hidden:true,editable:false},
+                            { columngroup: 'year<?php echo $i; ?>',text: 'HOM Target', dataField: 'year<?php echo $i; ?>_hom_quantity_target',align:'center',width:'75',cellsAlign:'right',cellsrenderer: cellsrenderer,editable:false},
                             <?php
                             foreach($areas as $area)
                             {
                                 ?>
-                                { columngroup: 'year<?php echo $i; ?>_area_<?php echo $area['value']; ?>',text: 'Budget', dataField: 'year<?php echo $i; ?>_area<?php echo $area['value']; ?>_quantity_budget',align:'center',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer,hidden:true,editable:false},
+                                { columngroup: 'year<?php echo $i; ?>_area_<?php echo $area['value']; ?>',text: 'Prev. Target', dataField: 'year<?php echo $i; ?>_area<?php echo $area['value']; ?>_previous_target',align:'center',width:'70',cellsAlign:'right',cellsrenderer: cellsrenderer,hidden:false,editable:false},
+                                { columngroup: 'year<?php echo $i; ?>_area_<?php echo $area['value']; ?>',text: 'Prediction Target', dataField: 'year<?php echo $i; ?>_area<?php echo $area['value']; ?>_previous_prediction_target',align:'center',width:'70',cellsAlign:'right',cellsrenderer: cellsrenderer,hidden:false,editable:false},
+                                { columngroup: 'year<?php echo $i; ?>_area_<?php echo $area['value']; ?>',text: 'Budget', dataField: 'year<?php echo $i; ?>_area<?php echo $area['value']; ?>_quantity_budget',align:'center',width:'70',cellsAlign:'right',cellsrenderer: cellsrenderer,hidden:true,editable:false},
                                 { columngroup: 'year<?php echo $i; ?>_area_<?php echo $area['value']; ?>',text: 'Target', dataField: 'year<?php echo $i; ?>_area<?php echo $area['value']; ?>_quantity_target',align:'center',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer,columntype:'custom',
                                     cellbeginedit: function (row) {
                                         var selectedRowData = $('#system_jqx_container').jqxGrid('getrowdata', row);//only last selected

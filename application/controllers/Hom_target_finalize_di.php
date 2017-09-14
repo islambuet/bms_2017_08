@@ -180,7 +180,7 @@ class Hom_target_finalize_di extends Root_Controller
         }
 
         $data['title']='HOM Assign Target to DI';
-        $data['years_previous']=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id <'.$reports['year_id']),$this->config->item('num_year_previous_sell'),0,array('id DESC'));
+        $data['years_previous']=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id <'.$reports['year_id']),$this->config->item('num_year_previous_sell'),0,array('id ASC'));
         $data['year_current']=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id ='.$reports['year_id']),1,0,array('id ASC'));
         $data['years_next']=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id >'.$reports['year_id']),$this->config->item('num_year_budget_prediction'),0,array('id ASC'));
         $ajax['status']=true;
@@ -198,7 +198,7 @@ class Hom_target_finalize_di extends Root_Controller
         $year_id=$this->input->post('year_id');
         $crop_type_id=$this->input->post('crop_type_id');
 
-        $years_previous=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id <'.$year_id),$this->config->item('num_year_previous_sell'),0,array('id DESC'));
+        $years_previous=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id <'.$year_id),$this->config->item('num_year_previous_sell'),0,array('id ASC'));
         $year_current=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id ='.$year_id),1,0,array('id ASC'));
         $years_next=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id >'.$year_id),$this->config->item('num_year_budget_prediction'),0,array('id ASC'));
 
@@ -226,7 +226,7 @@ class Hom_target_finalize_di extends Root_Controller
             $items_current_hom[$result['variety_id']][$result['year_index']]=$result;
         }
 
-        //getting hom budget-target forward data
+        //getting hom current year budget-target forward data
         $this->db->select('*');
         $this->db->from($this->config->item('table_bms_hom_forward'));
         $this->db->where('year_id',$year_id);
@@ -249,6 +249,19 @@ class Hom_target_finalize_di extends Root_Controller
             $hom_forward_status_assign_target_di=true;
         }
 
+        //getting hom previous year budget-target forward data
+        $this->db->select('*');
+        $this->db->from($this->config->item('table_bms_hom_forward'));
+        $this->db->where('year_id',$year_id-1);
+        $this->db->where('crop_type_id',$crop_type_id);
+        $result=$this->db->get()->row_array();
+
+        $hom_previous_year_forward_status_assign_target_di=false;
+        if($result && $result['status_forward_assign_target']==$this->config->item('system_status_yes'))
+        {
+            $hom_previous_year_forward_status_assign_target_di=true;
+        }
+
         //getting areas(divisions) current year data
         $this->db->from($this->config->item('table_bms_di_budget_di').' bud');
         $this->db->select('bud.*');
@@ -263,7 +276,21 @@ class Hom_target_finalize_di extends Root_Controller
             $area_budget[$result['variety_id']][$result['year_index']][$result['division_id']]=$result;
         }
 
-        //get areas forward status
+        //getting areas(divisions) previous year data
+        $this->db->from($this->config->item('table_bms_di_budget_di').' bud');
+        $this->db->select('bud.*');
+        $this->db->where('bud.year_id',$year_id-1);
+        $this->db->where_in('bud.division_id',$area_ids);
+        $this->db->join($this->config->item('table_login_setup_classification_varieties').' v','v.id = bud.variety_id','INNER');
+        $this->db->where('v.crop_type_id',$crop_type_id);
+        $results=$this->db->get()->result_array();
+        $area_budget_previous_year=array();
+        foreach($results as $result)
+        {
+            $area_budget_previous_year[$result['variety_id']][$result['year_index']][$result['division_id']]=$result;
+        }
+
+        //get areas current year forward status
         $this->db->from($this->config->item('table_bms_di_forward'));
         $this->db->select('status_forward_budget,division_id');
         $this->db->where('year_id',$year_id);
@@ -296,9 +323,9 @@ class Hom_target_finalize_di extends Root_Controller
 
             for($i=0;$i<=count($years_next);$i++)
             {
-            	if(isset($items_current_hom[$result['id']][$i]))
-            	{
-            		if($hom_forward_status_budget)
+                if(isset($items_current_hom[$result['id']][$i]))
+                {
+                    if($hom_forward_status_budget)
                     {
                         $item['year'.$i.'_hom_quantity_budget']=$items_current_hom[$result['id']][$i]['quantity_budget'];
                     }
@@ -315,18 +342,18 @@ class Hom_target_finalize_di extends Root_Controller
                     {
                         $item['year'.$i.'_hom_quantity_target']='N/F';
                     }
-            	}
-            	else
-            	{
-            		$item['year'.$i.'_hom_quantity_budget']='N/D';
-            		$item['year'.$i.'_hom_quantity_target']='N/D';
-            	}
+                }
+                else
+                {
+                    $item['year'.$i.'_hom_quantity_budget']='N/D';
+                    $item['year'.$i.'_hom_quantity_target']='N/D';
+                }
 
-            	foreach($areas as $area)
-            	{
-            		if(isset($area_budget[$result['id']][$i][$area['value']]))
-	            	{
-	            		if(isset($area_forward_status[$area['value']]))
+                foreach($areas as $area)
+                {
+                    if(isset($area_budget[$result['id']][$i][$area['value']]))
+                    {
+                        if(isset($area_forward_status[$area['value']]))
                         {
                             $item['year'.$i.'_area'.$area['value'].'_quantity_budget']=$area_budget[$result['id']][$i][$area['value']]['quantity_budget'];
                         }
@@ -334,13 +361,13 @@ class Hom_target_finalize_di extends Root_Controller
                         {
                             $item['year'.$i.'_area'.$area['value'].'_quantity_budget']='N/F';
                         }
-	            		$item['year'.$i.'_area'.$area['value'].'_quantity_target']=$area_budget[$result['id']][$i][$area['value']]['quantity_target'];
-	            	}
-	            	else
-	            	{
-	            		$item['year'.$i.'_area'.$area['value'].'_quantity_budget']='N/D';
-	            		$item['year'.$i.'_area'.$area['value'].'_quantity_target']='0';
-	            	}
+                        $item['year'.$i.'_area'.$area['value'].'_quantity_target']=$area_budget[$result['id']][$i][$area['value']]['quantity_target'];
+                    }
+                    else
+                    {
+                        $item['year'.$i.'_area'.$area['value'].'_quantity_budget']='N/D';
+                        $item['year'.$i.'_area'.$area['value'].'_quantity_target']='0';
+                    }
 
                     if(isset($this->permissions['action3']) && ($this->permissions['action3']==1))
                     {
@@ -370,7 +397,41 @@ class Hom_target_finalize_di extends Root_Controller
                     {
                         $item['year'.$i.'_area'.$area['value'].'_quantity_target_editable']=false;
                     }
-            	}
+
+                    //previous year target
+                    if(isset($area_budget_previous_year[$result['id']][$i][$area['value']]))
+                    {
+                        if($hom_previous_year_forward_status_assign_target_di)
+                        {
+                            $item['year'.$i.'_area'.$area['value'].'_previous_target']=$area_budget_previous_year[$result['id']][$i][$area['value']]['quantity_target'];
+                        }
+                        else
+                        {
+                            $item['year'.$i.'_area'.$area['value'].'_previous_target']='N/F';
+                        }
+                    }
+                    else
+                    {
+                        $item['year'.$i.'_area'.$area['value'].'_previous_target']='N/D';
+                    }
+
+                    //prediction target
+                    if(isset($area_budget_previous_year[$result['id']][($i+1)][$area['value']]))
+                    {
+                        if($hom_previous_year_forward_status_assign_target_di)
+                        {
+                            $item['year'.$i.'_area'.$area['value'].'_previous_prediction_target']=$area_budget_previous_year[$result['id']][($i+1)][$area['value']]['quantity_target'];
+                        }
+                        else
+                        {
+                            $item['year'.$i.'_area'.$area['value'].'_previous_prediction_target']='N/F';
+                        }
+                    }
+                    else
+                    {
+                        $item['year'.$i.'_area'.$area['value'].'_previous_prediction_target']='N/D';
+                    }
+                }
             }
             $items[]=$item;
         }
