@@ -285,6 +285,21 @@ class Zi_target_finalize_ti extends Root_Controller
         }
         //print_r($area_budget);exit;
 
+        //getting areas(territories) last year data
+        $this->db->from($this->config->item('table_bms_ti_budget_ti').' bud');
+        $this->db->select('bud.*');
+        $this->db->where('bud.year_id',($year_id-1));
+        $this->db->where_in('bud.territory_id',$area_ids);
+        $this->db->join($this->config->item('table_login_setup_classification_varieties').' v','v.id = bud.variety_id','INNER');
+        $this->db->where('v.crop_type_id',$crop_type_id);
+        $results=$this->db->get()->result_array();
+        $last_year_area_budget=array();
+        foreach($results as $result)
+        {
+            $last_year_area_budget[$result['variety_id']][$result['year_index']][$result['territory_id']]=$result;
+        }
+        //print_r($last_year_area_budget);exit;
+
         //get areas forward status
         $this->db->from($this->config->item('table_bms_ti_forward'));
         $this->db->select('status_forward_budget,territory_id');
@@ -298,6 +313,20 @@ class Zi_target_finalize_ti extends Root_Controller
         {
             $area_forward_status[$result['territory_id']]=$result['territory_id'];
         }
+
+        //get last year areas assign target forward status
+        $this->db->from($this->config->item('table_bms_zi_forward'));
+        $this->db->select('status_forward_assign_target');
+        $this->db->where('year_id',($year_id-1));
+        $this->db->where('crop_type_id',$crop_type_id);
+        $this->db->where('zone_id',$zone_id);
+        $result=$this->db->get()->row_array();
+        $last_year_forward_status_assign_target=false;
+        if($result && $result['status_forward_assign_target']==$this->config->item('system_status_yes'))
+        {
+            $last_year_forward_status_assign_target=true;
+        }
+        //print_r($result);exit;
 
         $results=Query_helper::get_info($this->config->item('table_login_setup_classification_varieties'),array('id','name'),array('crop_type_id ='.$crop_type_id,'status ="'.$this->config->item('system_status_active').'"','whose ="ARM"'),0,0,array('ordering ASC'));
 
@@ -364,6 +393,38 @@ class Zi_target_finalize_ti extends Root_Controller
                         $item['year'.$i.'_area'.$area['value'].'_quantity_target']='0';
                     }
 
+
+                    //area wise previous year target
+
+                    if(isset($last_year_area_budget[$result['id']][$i][$area['value']]))
+                    {
+                        if($last_year_forward_status_assign_target)
+                        {
+                            $item['year'.$i.'_area'.$area['value'].'_previous_target']=$last_year_area_budget[$result['id']][$i][$area['value']]['quantity_target'];
+                            if(isset($last_year_area_budget[$result['id']][$i+1][$area['value']]['quantity_target']))
+                            {
+                                $item['year'.$i.'_area'.$area['value'].'_previous_prediction_target']=$last_year_area_budget[$result['id']][$i+1][$area['value']]['quantity_target'];
+                            }
+                            else
+                            {
+                                $item['year'.$i.'_area'.$area['value'].'_previous_prediction_target']='0';
+                            }
+                        }
+                        else
+                        {
+                            $item['year'.$i.'_area'.$area['value'].'_previous_target']='N/F';
+                            $item['year'.$i.'_area'.$area['value'].'_previous_prediction_target']='N/F';
+                        }
+                    }
+                    else
+                    {
+                        $item['year'.$i.'_area'.$area['value'].'_previous_target']='N/D';
+                        $item['year'.$i.'_area'.$area['value'].'_previous_prediction_target']='N/D';
+                    }
+
+                    //last year
+
+
                     if(isset($this->permissions['action3']) && ($this->permissions['action3']==1))
                     {
                         $item['year'.$i.'_area'.$area['value'].'_quantity_target_editable']=true;
@@ -396,12 +457,11 @@ class Zi_target_finalize_ti extends Root_Controller
             }
             $items[]=$item;
         }
-
+//print_r($items);exit;
         $this->json_return($items);
     }
     private function system_save()
     {
-        //print_r($_POST);exit;
         if((isset($this->permissions['action1']) && ($this->permissions['action1']==1))||(isset($this->permissions['action2']) && ($this->permissions['action2']==1))||(isset($this->permissions['action3']) && ($this->permissions['action3']==1)))
         {
             $user = User_helper::get_user();
