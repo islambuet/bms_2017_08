@@ -277,6 +277,8 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 foreach($areas as $area)
                 {
                     ?>
+                { name: 'year<?php echo $i; ?>_area<?php echo $area['value']; ?>_previous_target', type: 'string' },
+                { name: 'year<?php echo $i; ?>_area<?php echo $area['value']; ?>_previous_prediction_target', type: 'string' },
                 { name: 'year<?php echo $i; ?>_area<?php echo $area['value']; ?>_quantity_budget', type: 'string' },
                 { name: 'year<?php echo $i; ?>_area<?php echo $area['value']; ?>_quantity_target', type: 'string' },
                 { name: 'year<?php echo $i; ?>_area<?php echo $area['value']; ?>_quantity_target_editable', type: 'string' },
@@ -332,6 +334,8 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                     foreach($areas as $area)
                     {
                         ?>
+                    { columngroup: 'year<?php echo $i; ?>_area_<?php echo $area['value']; ?>',text: 'Prev. Target', dataField: 'year<?php echo $i; ?>_area<?php echo $area['value']; ?>_previous_target',align:'center',width:'70',cellsAlign:'right',cellsrenderer: cellsrenderer,hidden:false,editable:false},
+                    { columngroup: 'year<?php echo $i; ?>_area_<?php echo $area['value']; ?>',text: 'Prediction Target', dataField: 'year<?php echo $i; ?>_area<?php echo $area['value']; ?>_previous_prediction_target',align:'center',width:'70',cellsAlign:'right',cellsrenderer: cellsrenderer,hidden:false,editable:false},
                     { columngroup: 'year<?php echo $i; ?>_area_<?php echo $area['value']; ?>',text: 'Budget', dataField: 'year<?php echo $i; ?>_area<?php echo $area['value']; ?>_quantity_budget',align:'center',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer,hidden:true,editable:false},
                     { columngroup: 'year<?php echo $i; ?>_area_<?php echo $area['value']; ?>',text: 'Target', dataField: 'year<?php echo $i; ?>_area<?php echo $area['value']; ?>_quantity_target',align:'center',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer,columntype:'custom',
                         cellbeginedit: function (row) {
