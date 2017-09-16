@@ -110,8 +110,8 @@ class Ti_target_finalize_outlet extends Root_Controller
         //get my outlet ids and outlet names
         $this->db->from($this->config->item('table_login_csetup_customer').' outlet');
         $this->db->where('outlet.status',$this->config->item('system_status_active'));
-        $this->db->select('outlet.id');
-        $this->db->select('out_info.name text,out_info.id value');
+        $this->db->select('outlet.id value');
+        $this->db->select('out_info.name text');
         $this->db->join($this->config->item('table_login_csetup_cus_info').' out_info','out_info.customer_id = outlet.id and out_info.revision = 1','INNER');
         $this->db->where('out_info.type',$this->config->item('system_customer_type_outlet_id'));
 
@@ -123,7 +123,7 @@ class Ti_target_finalize_outlet extends Root_Controller
         $outlet_ids=array('0');
         foreach($results as $result)
         {
-            $outlet_ids[]=$result['id'];
+            $outlet_ids[]=$result['value'];
             $data['areas'][$result['value']]=$result;
         }
         //market survey size
