@@ -192,4 +192,6 @@ $lang['MSG_ALREADY_FORWARDED'] = 'Already Forwarded.';
 $lang['MSG_SUCCESSFULLY_FORWARDED'] = 'Forwarded Successfully.';
 $lang['MSG_ALREADY_FINALIZED'] = 'Already Finalized.';
 
-
+//Currency Setup
+$lang['LABEL_CURRENCY_SYMBOL'] = 'Currency Symbol';
+$lang['ACTION_CURRENCY_RATE'] = 'Currency Rate';
