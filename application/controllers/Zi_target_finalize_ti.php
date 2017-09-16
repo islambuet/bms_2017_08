@@ -208,6 +208,7 @@ class Zi_target_finalize_ti extends Root_Controller
         $year_id=$this->input->post('year_id');
         $zone_id=$this->input->post('zone_id');
         $crop_type_id=$this->input->post('crop_type_id');
+        $division_id=$this->input->post('division_id');
 
         $years_previous=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id <'.$year_id),$this->config->item('num_year_previous_sell'),0,array('id DESC'));
         $year_current=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id ='.$year_id),1,0,array('id ASC'));
@@ -256,14 +257,12 @@ class Zi_target_finalize_ti extends Root_Controller
         }
         //print_r($result);exit;
 
-        $result=Query_helper::get_info($this->config->item('table_login_setup_location_zones'),array('division_id'),array('id='.$zone_id),1);
         $this->db->from($this->config->item('table_bms_di_forward').' di_forward');
         $this->db->select('di_forward.status_forward_assign_target status_forward_di_assign_target');
         $this->db->where('year_id',$year_id);
         $this->db->where('crop_type_id',$crop_type_id);
-        $this->db->where('division_id',$result['division_id']);
+        $this->db->where('division_id',$division_id);
         $result=$this->db->get()->row_array();
-        //print_r($result);exit;
         $zi_forward_status_target=false;
         if($result && $result['status_forward_di_assign_target']==$this->config->item('system_status_yes'))
         {
@@ -603,7 +602,7 @@ class Zi_target_finalize_ti extends Root_Controller
         {
             $ajax['status']=true;
             $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>'');
-            $ajax['system_message']="This Target Assign to DI already Forwarded";
+            $ajax['system_message']="This Target Assign to TI already Forwarded";
             $this->json_return($ajax);
         }
         else if((isset($this->permissions['action1']) && ($this->permissions['action1']==1))||(isset($this->permissions['action2']) && ($this->permissions['action2']==1))||(isset($this->permissions['action3']) && ($this->permissions['action3']==1)))
