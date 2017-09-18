@@ -135,15 +135,15 @@ class Mgt_quantity_confirmed extends Root_Controller
         }
 
         //Confirmed data from principals
-        $this->db->from($this->config->item('table_login_setup_variety_principals').' set');
-        $this->db->select('set.principal_id,set.name_import');
-        $this->db->where('set.variety_id',$reports['variety_id']);
-        $this->db->where('set.revision',1);
-        $this->db->select('basic.name principal_name');
-        $this->db->join($this->config->item('table_login_basic_setup_principal').' basic','basic.id = set.principal_id','INNER');
-        $this->db->where('basic.status!=',$this->config->item('system_status_delete'));
+        $this->db->from($this->config->item('table_login_setup_variety_principals').' vp');
+        $this->db->select('vp.principal_id,vp.name_import');
+        $this->db->where('vp.variety_id',$reports['variety_id']);
+        $this->db->where('vp.revision',1);
+        $this->db->select('p.name principal_name');
+        $this->db->join($this->config->item('table_login_basic_setup_principal').' p','p.id = vp.principal_id','INNER');
+        $this->db->where('p.status!=',$this->config->item('system_status_delete'));
         $this->db->select('confirm.currency_id,confirm.unit_price,confirm.quantity_total,confirm.quantity_1,confirm.quantity_2,confirm.quantity_3,confirm.quantity_4,confirm.quantity_5,confirm.quantity_6,confirm.quantity_7,confirm.quantity_8,confirm.quantity_9,confirm.quantity_10,confirm.quantity_11,confirm.quantity_12,');
-        $this->db->join($this->config->item('table_bms_mgt_quantity_confirm').' confirm','confirm.principal_id = set.principal_id and confirm.variety_id = set.variety_id and confirm.year_id = '.$reports['year_id'],'LEFT');
+        $this->db->join($this->config->item('table_bms_mgt_quantity_confirm').' confirm','confirm.principal_id = vp.principal_id and confirm.variety_id = vp.variety_id and confirm.year_id = '.$reports['year_id'],'LEFT');
         $results=$this->db->get()->result_array();
         //print_r($results);exit;
         foreach($results as $result)
@@ -151,7 +151,7 @@ class Mgt_quantity_confirmed extends Root_Controller
             $data['principals'][$result['principal_id']]=$result;
         }
         //print_r($data);exit;
-        $data['title']='Quantity Confirmed for variety_name';
+        $data['title']='Quantity Confirmed for '.$data['variety']['name'];
         $ajax['status']=true;
         $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>$this->load->view($this->controller_url."/add_edit",$data,true));
         if($this->message)
