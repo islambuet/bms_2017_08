@@ -423,7 +423,7 @@ class Ti_target_finalize_outlet extends Root_Controller
                             }
                             else
                             {
-                                $item['year'.$i.'_area'.$area['value'].'_previous_prediction_target']='0';
+                                $item['year'.$i.'_area'.$area['value'].'_previous_prediction_target']='N/D';
                             }
                         }
                         else
