@@ -136,10 +136,7 @@ class Setup_currency extends Root_Controller
             {
                 $item_id=$this->input->post('id');
             }
-            $this->db->from($this->config->item('table_bms_setup_currency').' currency');
-            $this->db->select('currency.name');
-            $this->db->where('currency.id',$item_id);
-            $item=$this->db->get()->row_array();
+            $item=Query_helper::get_info($this->config->item('table_bms_setup_currency'),'*',array('id ='.$item_id),1);
             if(!$item)
             {
                 $ajax['status']=false;
@@ -171,7 +168,7 @@ class Setup_currency extends Root_Controller
         $this->db->from($this->config->item('table_login_basic_setup_fiscal_year').' year');
         $this->db->select('year.id,year.name');
         $this->db->select('currency_rate.rate');
-        $this->db->join($this->config->item('table_bms_setup_currency_rate').' currency_rate','currency_rate.fiscal_year_id = year.id and currency_rate.currency_id = '.$item_id.'','LEFT');
+        $this->db->join($this->config->item('table_bms_setup_currency_rate').' currency_rate','currency_rate.fiscal_year_id = year.id and currency_rate.currency_id = '.$item_id.' and currency_rate.status != "'.$this->config->item('system_status_delete').'"','LEFT');
         $this->db->where('year.status !=',$this->config->item('system_status_delete'));
         $this->db->order_by('year.id','ASC');
         $items=$this->db->get()->result_array();
@@ -201,7 +198,7 @@ class Setup_currency extends Root_Controller
             $data['item']=Query_helper::get_info($this->config->item('table_bms_setup_currency'),'*',array('id ='.$currency_id),1);
             $data['title']="Edit Currency (".$data['item']['name'].')';
             $ajax['status']=true;
-            $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view("setup_currency/add_edit_currency",$data,true));
+            $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view($this->controller_url."/add_edit_currency",$data,true));
             if($this->message)
             {
                 $ajax['system_message']=$this->message;
@@ -245,7 +242,7 @@ class Setup_currency extends Root_Controller
             //print_r($data['currency']);exit;
             $data['title']="Edit ".$data['currency']['name']." Rate";
             $ajax['status']=true;
-            $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view("setup_currency/edit_rate",$data,true));
+            $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view($this->controller_url."/edit_rate",$data,true));
             if($this->message)
             {
                 $ajax['system_message']=$this->message;
