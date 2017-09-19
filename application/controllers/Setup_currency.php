@@ -215,21 +215,15 @@ class Setup_currency extends Root_Controller
     }
     private function system_edit_rate($currency_id,$id)
     {
-        if($currency_id<1)
-        {
-            $ajax['status']=false;
-            $ajax['system_message']='Invalid Try';
-            $this->json_return($ajax);
-        }
         if(isset($this->permissions['action2'])&&($this->permissions['action2']==1))
         {
-            if(($this->input->post('id')))
+            if($id>0)
             {
-                $year_id=$this->input->post('id');
+                $year_id=$id;
             }
             else
             {
-                $year_id=$id;
+                $year_id=$this->input->post('id');
             }
 
             $this->db->from($this->config->item('table_bms_setup_currency').' currency');
@@ -237,10 +231,15 @@ class Setup_currency extends Root_Controller
             $this->db->select('currency_rate.rate');
             $this->db->join($this->config->item('table_bms_setup_currency_rate').' currency_rate','currency_rate.currency_id = currency.id and currency_rate.fiscal_year_id = '.$year_id.'','LEFT');
             $this->db->where('currency.id',$currency_id);
-            $data['currency']=$this->db->get()->row_array();
-            $data['currency']['fiscal_year_id']=$year_id;
-            //print_r($data['currency']);exit;
-            $data['title']="Edit ".$data['currency']['name']." Rate";
+            $data['item']=$this->db->get()->row_array();
+            if(!$data['item'])
+            {
+                $ajax['status']=false;
+                $ajax['system_message']='Invalid Currency Rate or Fiscal Year';
+                $this->json_return($ajax);
+            }
+            $data['item']['fiscal_year_id']=$year_id;
+            $data['title']="Edit ".$data['item']['name']." Rate";
             $ajax['status']=true;
             $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view($this->controller_url."/edit_rate",$data,true));
             if($this->message)
@@ -356,7 +355,7 @@ class Setup_currency extends Root_Controller
         }
         else
         {
-            $data=$this->input->post('currency');
+            $data=$this->input->post('item');
             $info=Query_helper::get_info($this->config->item('table_bms_setup_currency_rate'),'*',array('currency_id ='.$id,'fiscal_year_id ='.$fiscal_year_id),1);
             //print_r($info);exit;
             $this->db->trans_start();  //DB Transaction Handle START
@@ -404,7 +403,7 @@ class Setup_currency extends Root_Controller
     private function check_validation_for_currency_rate()
     {
         $this->load->library('form_validation');
-        $this->form_validation->set_rules('currency[rate]','Currency Rate','required');
+        $this->form_validation->set_rules('item[rate]','Currency Rate','required');
 
         if($this->form_validation->run() == FALSE)
         {

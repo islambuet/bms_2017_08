@@ -4,7 +4,7 @@ $CI=& get_instance();
 $action_buttons=array();
 $action_buttons[]=array(
     'label'=>$CI->lang->line("ACTION_BACK"),
-    'href'=>site_url($CI->controller_url.'/index/list_rate/'.$currency['id'])
+    'href'=>site_url($CI->controller_url.'/index/list_rate/'.$item['id'])
 );
 $action_buttons[]=array(
     'type'=>'button',
@@ -21,8 +21,8 @@ $action_buttons[]=array(
 $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 ?>
 <form class="form_valid" id="save_form" action="<?php echo site_url($CI->controller_url.'/index/save_rate');?>" method="post">
-    <input type="hidden" id="id" name="id" value="<?php echo $currency['id']; ?>" />
-    <input type="hidden" id="fiscal_year_id" name="fiscal_year_id" value="<?php echo $currency['fiscal_year_id']; ?>" />
+    <input type="hidden" id="id" name="id" value="<?php echo $item['id']; ?>" />
+    <input type="hidden" id="fiscal_year_id" name="fiscal_year_id" value="<?php echo $item['fiscal_year_id']; ?>" />
     <div class="row widget">
         <div class="widget-header">
             <div class="title">
@@ -33,10 +33,10 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 
         <div class="row show-grid">
             <div class="col-xs-4">
-                <label class="control-label pull-right"><?php echo $currency['name'].' Rate';?><span style="color:#FF0000">*</span></label>
+                <label class="control-label pull-right"><?php echo $item['name'].' Rate';?><span style="color:#FF0000">*</span></label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <input type="text" name="currency[rate]" id="value" class="form-control float_type_positive" value="<?php echo $currency['rate'];?>"/>
+                <input type="text" name="item[rate]" id="value" class="form-control float_type_positive" value="<?php echo $item['rate'];?>"/>
             </div>
         </div>
     </div>
