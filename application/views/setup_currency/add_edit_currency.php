@@ -27,7 +27,7 @@ $action_buttons[]=array(
 $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 ?>
 <form class="form_valid" id="save_form" action="<?php echo site_url($CI->controller_url.'/index/save');?>" method="post">
-    <input type="hidden" id="id" name="id" value="<?php echo $currency['id']; ?>" />
+    <input type="hidden" id="id" name="id" value="<?php echo $item['id']; ?>" />
     <input type="hidden" id="system_save_new_status" name="system_save_new_status" value="0" />
     <div class="row widget">
         <div class="widget-header">
@@ -42,7 +42,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <label class="control-label pull-right"><?php echo $this->lang->line('LABEL_NAME');?><span style="color:#FF0000">*</span></label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <input type="text" name="currency[name]" id="name" class="form-control" value="<?php echo $currency['name'];?>"/>
+                <input type="text" name="item[name]" id="name" class="form-control" value="<?php echo $item['name'];?>"/>
             </div>
         </div>
         <div class="row show-grid">
@@ -50,7 +50,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <label class="control-label pull-right"><?php echo $this->lang->line('LABEL_CURRENCY_SYMBOL');?></label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <input type="text" name="currency[symbol]" id="symbol" class="form-control" value="<?php echo $currency['symbol'];?>"/>
+                <input type="text" name="item[symbol]" id="symbol" class="form-control" value="<?php echo $item['symbol'];?>"/>
             </div>
         </div>
         <div style="" class="row show-grid">
@@ -58,7 +58,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_DESCRIPTION');?></label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <textarea name="currency[description]" id="description" class="form-control"><?php echo $currency['description'] ?></textarea>
+                <textarea name="item[description]" id="description" class="form-control"><?php echo $item['description'] ?></textarea>
             </div>
         </div>
         <div style="" class="row show-grid">
@@ -66,7 +66,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_ORDER');?><span style="color:#FF0000">*</span></label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <input type="text" name="currency[ordering]" id="ordering" class="form-control" value="<?php echo $currency['ordering'] ?>" >
+                <input type="text" name="item[ordering]" id="ordering" class="form-control" value="<?php echo $item['ordering'] ?>" >
             </div>
         </div>
         <div style="" class="row show-grid">
@@ -74,17 +74,17 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <label class="control-label pull-right"><?php echo $CI->lang->line('STATUS');?><span style="color:#FF0000">*</span></label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <select id="status" name="currency[status]" class="form-control">
+                <select id="status" name="item[status]" class="form-control">
                     <option value="<?php echo $CI->config->item('system_status_active'); ?>"
                         <?php
-                        if ($currency['status'] == $CI->config->item('system_status_active')) {
+                        if ($item['status'] == $CI->config->item('system_status_active')) {
                             echo "selected='selected'";
                         }
                         ?> ><?php echo $CI->lang->line('ACTIVE') ?>
                     </option>
                     <option value="<?php echo $CI->config->item('system_status_inactive'); ?>"
                         <?php
-                        if ($currency['status'] == $CI->config->item('system_status_inactive')) {
+                        if ($item['status'] == $CI->config->item('system_status_inactive')) {
                             echo "selected='selected'";
                         }
                         ?> ><?php echo $CI->lang->line('INACTIVE') ?></option>

@@ -100,7 +100,7 @@ class Setup_currency extends Root_Controller
         if(isset($this->permissions['action1'])&&($this->permissions['action1']==1))
         {
             $data['title']="Create Currency";
-            $data["currency"] = Array(
+            $data["item"] = Array(
                 'id' => 0,
                 'name' => '',
                 'symbol' => '',
@@ -110,7 +110,7 @@ class Setup_currency extends Root_Controller
             );
             $ajax['system_page_url']=site_url($this->controller_url."/index/add");
             $ajax['status']=true;
-            $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view("setup_currency/add_edit_currency",$data,true));
+            $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view($this->controller_url."/add_edit_currency",$data,true));
             if($this->message)
             {
                 $ajax['system_message']=$this->message;
@@ -198,8 +198,8 @@ class Setup_currency extends Root_Controller
                 $currency_id=$id;
             }
 
-            $data['currency']=Query_helper::get_info($this->config->item('table_bms_setup_currency'),'*',array('id ='.$currency_id),1);
-            $data['title']="Edit Currency (".$data['currency']['name'].')';
+            $data['item']=Query_helper::get_info($this->config->item('table_bms_setup_currency'),'*',array('id ='.$currency_id),1);
+            $data['title']="Edit Currency (".$data['item']['name'].')';
             $ajax['status']=true;
             $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view("setup_currency/add_edit_currency",$data,true));
             if($this->message)
@@ -293,7 +293,7 @@ class Setup_currency extends Root_Controller
         }
         else
         {
-            $data=$this->input->post('currency');
+            $data=$this->input->post('item');
             $this->db->trans_start();  //DB Transaction Handle START
             if($id>0)
             {
@@ -394,8 +394,8 @@ class Setup_currency extends Root_Controller
     private function check_validation_for_currency()
     {
         $this->load->library('form_validation');
-        $this->form_validation->set_rules('currency[name]',$this->lang->line('LABEL_NAME'),'required');
-        $this->form_validation->set_rules('currency[status]',$this->lang->line('STATUS'),'required');
+        $this->form_validation->set_rules('item[name]',$this->lang->line('LABEL_NAME'),'required');
+        $this->form_validation->set_rules('item[status]',$this->lang->line('STATUS'),'required');
 
         if($this->form_validation->run() == FALSE)
         {
@@ -416,17 +416,4 @@ class Setup_currency extends Root_Controller
         }
         return true;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
