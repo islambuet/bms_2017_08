@@ -5,7 +5,6 @@ class Mgt_quantity_confirmed extends Root_Controller
     private  $message;
     public $permissions;
     public $controller_url;
-    public $locations;
     public function __construct()
     {
         parent::__construct();
