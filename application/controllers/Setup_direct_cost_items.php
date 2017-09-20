@@ -12,13 +12,6 @@ class Setup_direct_cost_items extends Root_Controller
         $this->message="";
         $this->permissions=User_helper::get_permission('Setup_direct_cost_items');
         $this->controller_url='setup_direct_cost_items';
-        $this->locations=User_helper::get_locations();
-        if(!($this->locations))
-        {
-            $ajax['status']=false;
-            $ajax['system_message']=$this->lang->line('MSG_LOCATION_NOT_ASSIGNED_OR_INVALID');
-            $this->json_return($ajax);
-        }
     }
 
     public function index($action="list",$id=0)
