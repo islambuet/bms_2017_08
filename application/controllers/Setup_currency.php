@@ -226,9 +226,8 @@ class Setup_currency extends Root_Controller
             $this->db->from($this->config->item('table_bms_setup_currency').' currency');
             $this->db->select('currency.id,currency.name');
             $this->db->select('currency_rate.rate');
-            $this->db->join($this->config->item('table_bms_setup_currency_rate').' currency_rate','currency_rate.currency_id = currency.id','INNER');
+            $this->db->join($this->config->item('table_bms_setup_currency_rate').' currency_rate','currency_rate.currency_id = currency.id and currency_rate.fiscal_year_id = '.$year_id.'','LEFT');
             $this->db->where('currency.id',$currency_id);
-            $this->db->where('currency_rate.fiscal_year_id',$year_id);
             $data['item']=$this->db->get()->row_array();
             if(!$data['item'])
             {
