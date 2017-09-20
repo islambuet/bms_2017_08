@@ -335,16 +335,19 @@ class Setup_packing_item extends Root_Controller
         			$this->db->set('user_updated',$user->user_id);
 
         			$this->db->where('variety_id',$variety_id);
-        			$this->db->where('packing_item_id',$packing_item_id);
+        			$this->db->where('packing_item_id',$id);
 
         			$this->db->update($this->config->item('table_bms_setup_packing_items_cost'));
         		}
         	}
         	else
         	{
-        		$data_add['variety_id']=$variety_id;
-        		$data_add['cost']=$cost;
-        		Query_helper::add($this->config->item('table_bms_setup_packing_items_cost'),$data_add);
+        		if($cost>0)
+                {
+                    $data_add['variety_id']=$variety_id;
+                    $data_add['cost']=$cost;
+                    Query_helper::add($this->config->item('table_bms_setup_packing_items_cost'),$data_add);
+                }
         	}
         }
 
