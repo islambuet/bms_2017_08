@@ -5,7 +5,6 @@ class Setup_direct_cost_items extends Root_Controller
     private $message;
     public $permissions;
     public $controller_url;
-    public $locations;
     public function __construct()
     {
         parent::__construct();
