@@ -77,15 +77,14 @@ class Setup_packing_item extends Root_Controller
     private function system_get_items()
     {
     	$this->db->select('pt.*');
-    	$this->db->select('COUNT(ptc.variety_id) no_of_variety');
+        $this->db->select('SUM(CASE WHEN ptc.cost>0 THEN 1 ELSE 0 END) no_of_variety');
     	$this->db->from($this->config->item('table_bms_setup_packing_items').' pt');
     	$this->db->join($this->config->item('table_bms_setup_packing_items_cost').' ptc','ptc.packing_item_id=pt.id','LEFT');
     	$this->db->where('pt.status!=',$this->config->item('system_status_delete'));
     	$this->db->order_by('pt.ordering','ASC');
     	$this->db->group_by('pt.id');
-    	$items=$this->db->get()->result_array();
 
-    	#$items=Query_helper::get_info($this->config->item('table_bms_setup_packing_items'),'*',array('status!="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC'));
+    	$items=$this->db->get()->result_array();
         $this->json_return($items);
     }
     private function system_add()
