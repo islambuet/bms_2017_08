@@ -195,12 +195,22 @@ class Setup_packing_item extends Root_Controller
     private function system_get_variety_packing_cost_items()
     {
     	$id=$this->input->post('id');
+
     	$this->db->select('v.id,v.name variety_name');
     	$this->db->select('cost.cost');
+    	$this->db->select('crop.name crop_name');
+    	$this->db->select('type.name crop_type_name');
+
     	$this->db->from($this->config->item('table_login_setup_classification_varieties').' v');
     	$this->db->join($this->config->item('table_bms_setup_packing_items_cost').' cost','cost.variety_id=v.id AND cost.packing_item_id='.$id,'LEFT');
+    	$this->db->join($this->config->item('table_login_setup_classification_crop_types').' type','type.id=v.crop_type_id','INNER');
+    	$this->db->join($this->config->item('table_login_setup_classification_crops').' crop','crop.id=type.crop_id','INNER');
+
     	$this->db->where('v.status',$this->config->item('system_status_active'));
     	$this->db->where('v.whose','ARM');
+
+    	$this->db->order_by('crop.ordering','ASC');
+    	$this->db->order_by('type.ordering','ASC');
     	$this->db->order_by('v.ordering','ASC');
 
     	$items=$this->db->get()->result_array();
@@ -285,47 +295,72 @@ class Setup_packing_item extends Root_Controller
     	$id = $this->input->post("id");
         $user = User_helper::get_user();
         $time=time();
-        if($id==0)
+
+        if(!(isset($this->permissions['action2'])&&($this->permissions['action2']==1)))
+        {
+            $ajax['status']=false;
+            $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
+            $this->json_return($ajax);
+        }
+        if($id<1)
         {
             $ajax['status']=false;
             $ajax['system_message']='Invalid try';
             $this->json_return($ajax);
         }
-        $data=$this->input->post('items');
-        $this->db->trans_start();  //DB Transaction Handle START
-            if($id>0)
-            {
-                $data['user_updated'] = $user->user_id;
-                $data['date_updated'] = time();
+        $items=$this->input->post('items');
+        $results=Query_helper::get_info($this->config->item('table_bms_setup_packing_items_cost'),array('variety_id','cost'),array('packing_item_id='.$id));
+        $items_current=array();
+        foreach($results as $result)
+        {
+        	$items_current[$result['variety_id']]=$result['cost'];
+        }
 
-                Query_helper::update($this->config->item('table_bms_setup_packing_items'),$data,array("id = ".$id));
-            }
-            else
-            {
-                $data['user_created'] = $user->user_id;
-                $data['date_created'] = time();
-                Query_helper::add($this->config->item('table_bms_setup_packing_items'),$data);
-            }
-            $this->db->trans_complete();   //DB Transaction Handle END
-            if ($this->db->trans_status() === TRUE)
-            {
-                $save_and_new=$this->input->post('system_save_new_status');
-                $this->message=$this->lang->line("MSG_SAVED_SUCCESS");
-                if($save_and_new==1)
-                {
-                    $this->system_add();
-                }
-                else
-                {
-                    $this->system_list();
-                }
-            }
-            else
-            {
-                $ajax['status']=false;
-                $ajax['system_message']=$this->lang->line("MSG_SAVED_FAIL");
-                $this->json_return($ajax);
-            }
+        $data_add=array(
+        	'packing_item_id'=>$id,
+        	'revision_cost'=>1,
+        	'date_created'=>$time,
+        	'user_created'=>$user->user_id
+        );
+        $this->db->trans_start();  //DB Transaction Handle START
+
+        foreach($items as $variety_id=>$cost)
+        {
+        	if(isset($items_current[$variety_id]))
+        	{
+        		if($items_current[$variety_id]!=$cost)
+        		{
+        			$this->db->set('cost',$cost);
+        			$this->db->set('revision_cost','revision_cost+1',false);
+        			$this->db->set('date_updated',$time);
+        			$this->db->set('user_updated',$user->user_id);
+
+        			$this->db->where('variety_id',$variety_id);
+        			$this->db->where('packing_item_id',$packing_item_id);
+
+        			$this->db->update($this->config->item('table_bms_setup_packing_items_cost'));
+        		}
+        	}
+        	else
+        	{
+        		$data_add['variety_id']=$variety_id;
+        		$data_add['cost']=$cost;
+        		Query_helper::add($this->config->item('table_bms_setup_packing_items_cost'),$data_add);
+        	}
+        }
+
+        $this->db->trans_complete();   //DB Transaction Handle END
+        if ($this->db->trans_status() === TRUE)
+        {
+            $this->message=$this->lang->line("MSG_SAVED_SUCCESS");
+            $this->system_list();
+        }
+        else
+        {
+            $ajax['status']=false;
+            $ajax['system_message']=$this->lang->line("MSG_SAVED_FAIL");
+            $this->json_return($ajax);
+        }
     }
     private function check_validation()
     {

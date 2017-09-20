@@ -62,6 +62,8 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
     {
         ?>
         <div class="col-xs-12" style="margin-bottom: 20px;">
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="crop_name"><?php echo $CI->lang->line('LABEL_CROP_NAME'); ?></label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="crop_type_name"><?php echo $CI->lang->line('LABEL_CROP_TYPE'); ?></label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="variety_name"><?php echo $CI->lang->line('LABEL_VARIETY'); ?></label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="cost">Cost</label>
         </div>
@@ -105,6 +107,8 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             dataFields: [
                 { name: 'id', type: 'int' },
                 { name: 'variety_name', type: 'string' },
+                { name: 'crop_name', type: 'string' },
+                { name: 'crop_type_name', type: 'string' },
                 { name: 'cost', type: 'string' }
             ],
             id: 'id',
@@ -128,7 +132,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
         // create jqxgrid.
         $("#system_jqx_container").jqxGrid(
             {
-                width: '60%',
+                width: '100%',
                 source: dataAdapter,
                 pageable: true,
                 filterable: true,
@@ -143,8 +147,10 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 autoheight:true,
                 editable:true,
                 columns: [
-                    { text: '<?php echo $CI->lang->line('LABEL_VARIETY'); ?>', dataField: 'variety_name',width:'70%',cellsrenderer: cellsrenderer,editable:false},
-                    { text: 'Cost', dataField: 'cost',width:'100',width:'30%',cellsalign: 'right',cellsrenderer: cellsrenderer
+                    { text: '<?php echo $CI->lang->line('LABEL_CROP_NAME'); ?>', dataField: 'crop_name',width:'250',filtertype:'list',cellsrenderer: cellsrenderer,editable:false},
+                    { text: '<?php echo $CI->lang->line('LABEL_CROP_TYPE'); ?>', dataField: 'crop_type_name',width:'250',filtertype:'list',cellsrenderer: cellsrenderer,editable:false},
+                    { text: '<?php echo $CI->lang->line('LABEL_VARIETY'); ?>', dataField: 'variety_name',width:'300',cellsrenderer: cellsrenderer,editable:false},
+                    { text: 'Cost', dataField: 'cost',width:'100',width:'150',cellsalign: 'right',cellsrenderer: cellsrenderer
                         <?php
                         if((isset($CI->permissions['action2']) && ($CI->permissions['action2']==1)))
                         {
