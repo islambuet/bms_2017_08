@@ -12,13 +12,6 @@ class Setup_currency extends Root_Controller
         $this->message="";
         $this->permissions=User_helper::get_permission('Setup_currency');
         $this->controller_url='setup_currency';
-        $this->locations=User_helper::get_locations();
-        if(!($this->locations))
-        {
-            $ajax['status']=false;
-            $ajax['system_message']=$this->lang->line('MSG_LOCATION_NOT_ASSIGNED_OR_INVALID');
-            $this->json_return($ajax);
-        }
     }
 
     public function index($action="list",$id=0,$id1=0)
@@ -225,7 +218,6 @@ class Setup_currency extends Root_Controller
             {
                 $year_id=$this->input->post('id');
             }
-
             $this->db->from($this->config->item('table_bms_setup_currency').' currency');
             $this->db->select('currency.id,currency.name');
             $this->db->select('currency_rate.rate');
