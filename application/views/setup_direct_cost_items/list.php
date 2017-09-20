@@ -81,7 +81,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
         // create jqxgrid.
         $("#system_jqx_container").jqxGrid(
             {
-                width: '60%',
+                width: '80%',
                 source: dataAdapter,
                 pageable: true,
                 filterable: true,
@@ -94,11 +94,11 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 altrows: true,
                 autoheight: true,
                 columns: [
-                    { text: 'ID', dataField: 'id',width:'10%',cellsalign: 'right'},
-                    { text: '<?php echo $CI->lang->line('LABEL_NAME'); ?>', dataField: 'name',width:'20%'},
-                    { text: '<?php echo $CI->lang->line('LABEL_PERCENTAGE'); ?>', dataField: 'percentage',width:'25%'},
-                    { text: '<?php echo $CI->lang->line('LABEL_ORDER'); ?>', dataField: 'ordering',width:'20%',cellsalign: 'right'},
-                    { text: '<?php echo $CI->lang->line('STATUS'); ?>', dataField: 'status',filtertype: 'list',width:'25%',cellsalign: 'right'}
+                    { text: 'ID', dataField: 'id',width:'5%',cellsalign: 'right'},
+                    { text: '<?php echo $CI->lang->line('LABEL_NAME'); ?>', dataField: 'name',width:'40%'},
+                    { text: '<?php echo $CI->lang->line('LABEL_PERCENTAGE'); ?>', dataField: 'percentage',width:'20%'},
+                    { text: '<?php echo $CI->lang->line('LABEL_ORDER'); ?>', dataField: 'ordering',width:'15%',cellsalign: 'right'},
+                    { text: '<?php echo $CI->lang->line('STATUS'); ?>', dataField: 'status',filtertype: 'list',width:'20%',cellsalign: 'right'}
                 ]
             });
     });
