@@ -218,8 +218,9 @@ class Setup_currency extends Root_Controller
     {
         $this->load->library('form_validation');
         $this->form_validation->set_rules('item[name]',$this->lang->line('LABEL_NAME'),'required');
-        $this->form_validation->set_rules('item[status]',$this->lang->line('STATUS'),'required');
         $this->form_validation->set_rules('item[rate]',$this->lang->line('LABEL_CURRENCY_RATE'),'required');
+        $this->form_validation->set_rules('item[ordering]',$this->lang->line('LABEL_ORDER'),'required');
+        $this->form_validation->set_rules('item[status]',$this->lang->line('STATUS'),'required');
         if($this->form_validation->run() == FALSE)
         {
             $this->message=validation_errors();
