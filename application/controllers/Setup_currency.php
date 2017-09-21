@@ -13,7 +13,7 @@ class Setup_currency extends Root_Controller
         $this->controller_url='setup_currency';
     }
 
-    public function index($action="list",$id=0,$id1=0)
+    public function index($action="list",$id=0)
     {
         if($action=="list")
         {
@@ -34,22 +34,6 @@ class Setup_currency extends Root_Controller
         elseif($action=="save")
         {
             $this->system_save_currency();
-        }
-        elseif($action=='list_rate')
-        {
-            $this->system_list_rate($id);
-        }
-        elseif($action=='get_rate_items')
-        {
-            $this->system_get_rate_items($id);
-        }
-        elseif($action=="edit_rate")
-        {
-            $this->system_edit_rate($id,$id1);
-        }
-        elseif($action=="save_rate")
-        {
-            $this->system_save_currency_rate();
         }
         else
         {
@@ -81,7 +65,7 @@ class Setup_currency extends Root_Controller
     private function system_get_items()
     {
         $this->db->from($this->config->item('table_bms_setup_currency'));
-        $this->db->select('id,name,symbol,status,ordering');
+        $this->db->select('id,name,symbol,rate,status,ordering');
         $this->db->order_by('ordering','ASC');
         $this->db->where('status !=',$this->config->item('system_status_delete'));
         $items=$this->db->get()->result_array();
@@ -96,6 +80,7 @@ class Setup_currency extends Root_Controller
                 'id' => 0,
                 'name' => '',
                 'symbol' => '',
+                'rate' => '',
                 'description' => '',
                 'ordering' => 99,
                 'status' => $this->config->item('system_status_active')
@@ -115,64 +100,6 @@ class Setup_currency extends Root_Controller
             $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
             $this->json_return($ajax);
         }
-    }
-    private function system_list_rate($id)
-    {
-        if(isset($this->permissions['action0']) && ($this->permissions['action0']==1))
-        {
-            if($id>0)
-            {
-                $item_id=$id;
-            }
-            else
-            {
-                $item_id=$this->input->post('id');
-            }
-            $item=Query_helper::get_info($this->config->item('table_bms_setup_currency'),'*',array('id ='.$item_id),1);
-            if(!$item)
-            {
-                $ajax['status']=false;
-                $ajax['system_message']='Invalid Currency.';
-                $this->json_return($ajax);
-            }
-            $data['title']='Currency Rate of '.$item['name'];
-            $data['options']=array('currency_id'=>$item_id);
-            $ajax['status']=true;
-            $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/list_rate',$data,true));
-            if($this->message)
-            {
-                $ajax['system_message']=$this->message;
-            }
-            $ajax['system_page_url']=site_url($this->controller_url.'/index/list_rate/'.$item_id);
-            $this->json_return($ajax);
-        }
-        else
-        {
-            $ajax['status']=false;
-            $ajax['system_message']=$this->lang->line('YOU_DONT_HAVE_ACCESS');
-            $this->json_return($ajax);
-        }
-    }
-    private function system_get_rate_items()
-    {
-        $items=array();
-        $item_id=$this->input->post('currency_id');
-        $this->db->from($this->config->item('table_login_basic_setup_fiscal_year').' year');
-        $this->db->select('year.id,year.name');
-        $this->db->select('currency_rate.rate');
-        $this->db->join($this->config->item('table_bms_setup_currency_rate').' currency_rate','currency_rate.fiscal_year_id = year.id and currency_rate.currency_id = '.$item_id.' and currency_rate.status != "'.$this->config->item('system_status_delete').'"','LEFT');
-        $this->db->where('year.status !=',$this->config->item('system_status_delete'));
-        $this->db->order_by('year.id','ASC');
-        $items=$this->db->get()->result_array();
-        foreach($items as &$item)
-        {
-            if($item['rate']=='')
-            {
-                $item['rate']='Not Assigned';
-            }
-        }
-
-        $this->json_return($items);
     }
     private function system_edit_currency($id)
     {
@@ -201,48 +128,6 @@ class Setup_currency extends Root_Controller
                 $ajax['system_message']=$this->message;
             }
             $ajax['system_page_url']=site_url($this->controller_url.'/index/edit/'.$currency_id);
-            $this->json_return($ajax);
-        }
-        else
-        {
-            $ajax['status']=false;
-            $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
-            $this->json_return($ajax);
-        }
-    }
-    private function system_edit_rate($currency_id,$id)
-    {
-        if(isset($this->permissions['action2'])&&($this->permissions['action2']==1))
-        {
-            if($id>0)
-            {
-                $year_id=$id;
-            }
-            else
-            {
-                $year_id=$this->input->post('id');
-            }
-            $this->db->from($this->config->item('table_bms_setup_currency').' currency');
-            $this->db->select('currency.id,currency.name');
-            $this->db->select('currency_rate.rate');
-            $this->db->join($this->config->item('table_bms_setup_currency_rate').' currency_rate','currency_rate.currency_id = currency.id and currency_rate.fiscal_year_id = '.$year_id.'','LEFT');
-            $this->db->where('currency.id',$currency_id);
-            $data['item']=$this->db->get()->row_array();
-            if(!$data['item'])
-            {
-                $ajax['status']=false;
-                $ajax['system_message']='Invalid Currency Rate or Fiscal Year';
-                $this->json_return($ajax);
-            }
-            $data['item']['fiscal_year_id']=$year_id;
-            $data['title']="Edit ".$data['item']['name']." Rate";
-            $ajax['status']=true;
-            $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view($this->controller_url."/edit_rate",$data,true));
-            if($this->message)
-            {
-                $ajax['system_message']=$this->message;
-            }
-            $ajax['system_page_url']=site_url($this->controller_url.'/index/edit_rate/'.$currency_id.'/'.$year_id);
             $this->json_return($ajax);
         }
         else
@@ -284,13 +169,22 @@ class Setup_currency extends Root_Controller
         }
         else
         {
+            $time=time();
             $data=$this->input->post('item');
             $this->db->trans_start();  //DB Transaction Handle START
             if($id>0)
             {
-                $data['user_updated'] = $user->user_id;
-                $data['date_updated'] = time();
-                Query_helper::update($this->config->item('table_bms_setup_currency'),$data,array("id = ".$id));
+                $this->db->where('id',$id);
+                $this->db->set('name',$data['name']);
+                $this->db->set('symbol',$data['symbol']);
+                $this->db->set('rate',$data['rate']);
+                $this->db->set('description',$data['description']);
+                $this->db->set('ordering',$data['ordering']);
+                $this->db->set('status',$data['status']);
+                $this->db->set('revision','revision+1',false);
+                $this->db->set('user_updated',$user->user_id);
+                $this->db->set('date_updated',$time);
+                $this->db->update($this->config->item('table_bms_setup_currency'));
             }
             else
             {
@@ -320,85 +214,12 @@ class Setup_currency extends Root_Controller
             }
         }
     }
-    private function system_save_currency_rate()
-    {
-        $id = $this->input->post("id");
-        $fiscal_year_id = $this->input->post("fiscal_year_id");
-        $user = User_helper::get_user();
-        if($id>0 && $fiscal_year_id>0)
-        {
-            if(!(isset($this->permissions['action2'])&&($this->permissions['action2']==1)))
-            {
-                $ajax['status']=false;
-                $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
-                $this->json_return($ajax);
-                die();
-            }
-        }
-        else
-        {
-            $ajax['status']=false;
-            $ajax['system_message']='Invalid Try';
-            $this->json_return($ajax);
-            die();
-        }
-        if(!$this->check_validation_for_currency_rate())
-        {
-            $ajax['status']=false;
-            $ajax['system_message']=$this->message;
-            $this->json_return($ajax);
-        }
-        else
-        {
-            $data=$this->input->post('item');
-            $info=Query_helper::get_info($this->config->item('table_bms_setup_currency_rate'),'*',array('currency_id ='.$id,'fiscal_year_id ='.$fiscal_year_id),1);
-            $this->db->trans_start();  //DB Transaction Handle START
-            if($info)
-            {
-                $data['user_updated'] = $user->user_id;
-                $data['date_updated'] = time();
-                Query_helper::update($this->config->item('table_bms_setup_currency_rate'),$data,array("currency_id = ".$id,"fiscal_year_id = ".$fiscal_year_id));
-            }
-            else
-            {
-                $data['fiscal_year_id'] = $fiscal_year_id;
-                $data['currency_id'] = $id;
-                $data['user_created'] = $user->user_id;
-                $data['date_created'] = time();
-                Query_helper::add($this->config->item('table_bms_setup_currency_rate'),$data);
-            }
-            $this->db->trans_complete();   //DB Transaction Handle END
-            if ($this->db->trans_status() === TRUE)
-            {
-                $this->message=$this->lang->line("MSG_SAVED_SUCCESS");
-                $this->system_list_rate($id);
-            }
-            else
-            {
-                $ajax['status']=false;
-                $ajax['system_message']=$this->lang->line("MSG_SAVED_FAIL");
-                $this->json_return($ajax);
-            }
-        }
-    }
     private function check_validation_for_currency()
     {
         $this->load->library('form_validation');
         $this->form_validation->set_rules('item[name]',$this->lang->line('LABEL_NAME'),'required');
         $this->form_validation->set_rules('item[status]',$this->lang->line('STATUS'),'required');
-
-        if($this->form_validation->run() == FALSE)
-        {
-            $this->message=validation_errors();
-            return false;
-        }
-        return true;
-    }
-    private function check_validation_for_currency_rate()
-    {
-        $this->load->library('form_validation');
-        $this->form_validation->set_rules('item[rate]','Currency Rate','required');
-
+        $this->form_validation->set_rules('item[rate]',$this->lang->line('LABEL_CURRENCY_RATE'),'required');
         if($this->form_validation->run() == FALSE)
         {
             $this->message=validation_errors();

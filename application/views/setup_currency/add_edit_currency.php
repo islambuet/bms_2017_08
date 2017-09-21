@@ -53,6 +53,14 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <input type="text" name="item[symbol]" id="symbol" class="form-control" value="<?php echo $item['symbol'];?>"/>
             </div>
         </div>
+        <div class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right"><?php echo $this->lang->line('LABEL_CURRENCY_RATE');?></label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <input type="text" name="item[rate]" id="rate" class="form-control float_type_positive" value="<?php echo $item['rate'];?>"/>
+            </div>
+        </div>
         <div style="" class="row show-grid">
             <div class="col-xs-4">
                 <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_DESCRIPTION');?></label>

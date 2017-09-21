@@ -195,7 +195,7 @@ $lang['MSG_ALREADY_FINALIZED'] = 'Already Finalized.';
 
 //Currency Setup
 $lang['LABEL_CURRENCY_SYMBOL'] = 'Currency Symbol';
-$lang['ACTION_CURRENCY_RATE'] = 'Currency Rate';
+$lang['LABEL_CURRENCY_RATE'] = 'Currency Rate';
 
 //Direct Cost Items Percentage Setup
 $lang['LABEL_PERCENTAGE'] = 'Percentage';

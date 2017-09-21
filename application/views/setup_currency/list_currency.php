@@ -18,15 +18,6 @@ if(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))
         'data-action-link'=>site_url($CI->controller_url.'/index/edit')
     );
 }
-if(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))
-{
-    $action_buttons[]=array(
-        'type'=>'button',
-        'label'=>$CI->lang->line('ACTION_CURRENCY_RATE'),
-        'class'=>'button_jqx_action',
-        'data-action-link'=>site_url($CI->controller_url.'/index/list_rate')
-    );
-}
 if(isset($CI->permissions['action4']) && ($CI->permissions['action4']==1))
 {
     $action_buttons[]=array(
@@ -79,6 +70,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 { name: 'id', type: 'int' },
                 { name: 'name', type: 'string' },
                 { name: 'symbol', type: 'string' },
+                { name: 'rate', type: 'string' },
                 { name: 'ordering', type: 'int' },
                 { name: 'status', type: 'string' }
             ],
@@ -90,7 +82,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
         // create jqxgrid.
         $("#system_jqx_container").jqxGrid(
             {
-                width: '60%',
+                width: '100%',
                 source: dataAdapter,
                 pageable: true,
                 filterable: true,
@@ -105,9 +97,10 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 columns: [
                     { text: 'ID', dataField: 'id',width:'10%',cellsalign: 'right'},
                     { text: '<?php echo $CI->lang->line('LABEL_NAME'); ?>', dataField: 'name',width:'20%'},
-                    { text: '<?php echo $CI->lang->line('LABEL_CURRENCY_SYMBOL'); ?>', dataField: 'symbol',width:'25%'},
-                    { text: '<?php echo $CI->lang->line('LABEL_ORDER'); ?>', dataField: 'ordering',width:'20%',cellsalign: 'right'},
-                    { text: '<?php echo $CI->lang->line('STATUS'); ?>', dataField: 'status',filtertype: 'list',width:'25%',cellsalign: 'right'}
+                    { text: '<?php echo $CI->lang->line('LABEL_CURRENCY_SYMBOL'); ?>', dataField: 'symbol',width:'15%'},
+                    { text: '<?php echo $CI->lang->line('LABEL_CURRENCY_RATE'); ?>', dataField: 'rate',width:'20%',cellsalign:'right'},
+                    { text: '<?php echo $CI->lang->line('LABEL_ORDER'); ?>', dataField: 'ordering',width:'15%',cellsalign: 'right'},
+                    { text: '<?php echo $CI->lang->line('STATUS'); ?>', dataField: 'status',filtertype: 'list',width:'20%',cellsalign: 'right'}
                 ]
             });
     });
