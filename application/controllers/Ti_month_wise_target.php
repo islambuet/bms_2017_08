@@ -119,12 +119,10 @@ class Ti_month_wise_target extends Root_Controller
         $this->db->where('d.territory_id',$reports['territory_id']);
         $this->db->order_by('outlet.id','ASC');
         $results=$this->db->get()->result_array();
-        $data['areas']=array();
         $outlet_ids=array('0');
         foreach($results as $result)
         {
             $outlet_ids[]=$result['value'];
-            $data['areas'][$result['value']]=$result;
         }
         //market survey size
         $this->db->from($this->config->item('table_bms_setup_market_size').' ms');

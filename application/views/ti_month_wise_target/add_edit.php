@@ -160,38 +160,6 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             <label class="control-label"><?php echo $month_wise_target_info['date_forward'];?></label>
         </div>
     </div>
-    <?php
-    /*if(isset($CI->permissions['action6']) && ($CI->permissions['action6']==1))
-    {
-        ?>
-        <div class="col-xs-12" style="margin-bottom: 20px;">
-            <div class="col-xs-12" style="margin-bottom: 20px;">
-                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="year0_ti_quantity_budget">TI Budget (<?php echo $year_current['text']; ?>)</label>
-                <?php
-                foreach($areas as $area)
-                {
-                    ?>
-                    <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="year0_area<?php echo $area['value']; ?>_quantity_budget"><?php echo $area['text']; ?> Budget (<?php echo $year_current['text']; ?>)</label>
-                <?php
-                }
-                for($i=0;$i<sizeof($years_next);$i++)
-                {
-                    ?>
-                    <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="year<?php echo ($i+1); ?>_ti_quantity_budget">TI Budget (<?php echo $years_next[$i]['text']; ?>)</label>
-                    <?php
-                    foreach($areas as $area)
-                    {
-                        ?>
-                        <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="year<?php echo ($i+1); ?>_area<?php echo $area['value']; ?>_quantity_budget"><?php echo $area['text']; ?> Budget (<?php echo $years_next[$i]['text']; ?>)</label>
-                    <?php
-                    }
-                }
-                ?>
-            </div>
-        </div>
-    <?php
-    }*/
-    ?>
     <div class="col-xs-12" id="system_jqx_container">
 
     </div>
@@ -200,6 +168,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 <script type="text/javascript">
     $(document).ready(function ()
     {
+        system_preset({controller:'<?php echo $CI->router->class; ?>'});
         $(document).off('click', '#button_action_save_jqx');
         $(document).on("click", "#button_action_save_jqx", function(event)
         {
