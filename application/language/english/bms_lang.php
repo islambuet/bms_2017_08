@@ -199,3 +199,17 @@ $lang['LABEL_CURRENCY_RATE'] = 'Currency Rate';
 
 //Direct Cost Items Percentage Setup
 $lang['LABEL_PERCENTAGE'] = 'Percentage';
+
+//months array
+$lang['LABEL_MONTH_1'] = 'January';
+$lang['LABEL_MONTH_2'] = 'February';
+$lang['LABEL_MONTH_3'] = 'March';
+$lang['LABEL_MONTH_4'] = 'April';
+$lang['LABEL_MONTH_5'] = 'May';
+$lang['LABEL_MONTH_6'] = 'June';
+$lang['LABEL_MONTH_7'] = 'July';
+$lang['LABEL_MONTH_8'] = 'August';
+$lang['LABEL_MONTH_9'] = 'September';
+$lang['LABEL_MONTH_10'] = 'October';
+$lang['LABEL_MONTH_11'] = 'November';
+$lang['LABEL_MONTH_12'] = 'December';
