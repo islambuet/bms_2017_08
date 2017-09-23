@@ -96,8 +96,7 @@ class Setup_packing_item extends Root_Controller
                 'id' => 0,
                 'name' => '',
                 'description' => '',
-                'ordering' => 99,
-                'status' => $this->config->item('system_status_active')
+                'ordering' => 99
             );
             $ajax['system_page_url']=site_url($this->controller_url."/index/add");
 
