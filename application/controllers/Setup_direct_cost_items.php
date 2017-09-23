@@ -82,7 +82,6 @@ class Setup_direct_cost_items extends Root_Controller
                 'description' => '',
                 'percentage' => '',
                 'ordering' => 99,
-                'status' => $this->config->item('system_status_active')
             );
             $ajax['system_page_url']=site_url($this->controller_url."/index/add");
             $ajax['status']=true;
@@ -214,7 +213,6 @@ class Setup_direct_cost_items extends Root_Controller
         $this->load->library('form_validation');
         $this->form_validation->set_rules('item[name]',$this->lang->line('LABEL_NAME'),'required');
         $this->form_validation->set_rules('item[percentage]',$this->lang->line('LABEL_PERCENTAGE'),'required');
-        $this->form_validation->set_rules('item[status]',$this->lang->line('STATUS'),'required');
         if($this->form_validation->run() == FALSE)
         {
             $this->message=validation_errors();
