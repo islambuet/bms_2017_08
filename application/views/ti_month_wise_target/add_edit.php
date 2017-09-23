@@ -280,12 +280,12 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                             foreach($years_previous as $year)
                             {
                                 ?>
-                                { columngroup: 'year<?php echo $year['value']; ?>_month<?php echo $month_no; ?>',text: 'Target', dataField: 'year<?php echo $year['value']; ?>_month<?php echo $month_no; ?>_quantity_target',width:'150',align:'center',cellsAlign:'right',cellsrenderer: cellsrenderer,editable:false},
-                                { columngroup: 'year<?php echo $year['value']; ?>_month<?php echo $month_no; ?>',text: 'Achieved', dataField: 'year<?php echo $year['value']; ?>_month<?php echo $month_no; ?>_sell_quantity',width:'150',align:'center',cellsAlign:'right',cellsrenderer: cellsrenderer,editable:false},
+                                { columngroup: 'year<?php echo $year['value']; ?>_month<?php echo $month_no; ?>',text: 'Target', dataField: 'year<?php echo $year['value']; ?>_month<?php echo $month_no; ?>_quantity_target',width:'65',align:'center',cellsAlign:'right',cellsrenderer: cellsrenderer,editable:false},
+                                { columngroup: 'year<?php echo $year['value']; ?>_month<?php echo $month_no; ?>',text: 'Achieved', dataField: 'year<?php echo $year['value']; ?>_month<?php echo $month_no; ?>_sell_quantity',width:'65',align:'center',cellsAlign:'right',cellsrenderer: cellsrenderer,editable:false},
                                 <?php
                             }
                             ?>
-                            { columngroup: 'current_year_month<?php echo $month_no; ?>',text: 'Target', dataField: 'month<?php echo $month_no; ?>_quantity_target',width:'150',align:'center',cellsAlign:'right',cellsrenderer: cellsrenderer,columntype:'custom',
+                            { columngroup: 'current_year_month<?php echo $month_no; ?>',text: 'Target', dataField: 'month<?php echo $month_no; ?>_quantity_target',width:'100',align:'center',cellsAlign:'right',cellsrenderer: cellsrenderer,columntype:'custom',
                                 cellbeginedit: function (row) {
                                     var selectedRowData = $('#system_jqx_container').jqxGrid('getrowdata', row);//only last selected
                                     return selectedRowData['month<?php echo $month_no; ?>_quantity_target_editable'];
