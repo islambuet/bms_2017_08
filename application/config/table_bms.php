@@ -34,6 +34,7 @@ $config['table_bms_setup_bud_stock_minimum'] = 'arm_bms_2017_08.bms_setup_bud_st
 
 //MGT
 $config['table_bms_mgt_quantity_confirm'] = 'arm_bms_2017_08.bms_mgt_quantity_confirm';
+$config['table_bms_mgt_quantity_confirm_details'] = 'arm_bms_2017_08.bms_mgt_quantity_confirm_details';
 
 //packing item
 $config['table_bms_setup_packing_items'] = 'arm_bms_2017_08.bms_setup_packing_items';
