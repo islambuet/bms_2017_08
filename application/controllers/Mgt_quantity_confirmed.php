@@ -139,6 +139,14 @@ class Mgt_quantity_confirmed extends Root_Controller
         $this->db->select('details.currency_id,details.currency_rate,details.unit_price,details.cogs,details.total_cogs,details.quantity_total,details.quantity_1,details.quantity_2,details.quantity_3,details.quantity_4,details.quantity_5,details.quantity_6,details.quantity_7,details.quantity_8,details.quantity_9,details.quantity_10,details.quantity_11,details.quantity_12');
         $this->db->join($this->config->item('table_bms_mgt_quantity_confirm_details').' details','details.parent_id = confirm.id and details.principal_id = vp.principal_id','LEFT');
         $results=$this->db->get()->result_array();
+        //print_r($results);exit;
+        if(!$results)
+        {
+            $ajax['status']=false;
+            $ajax['system_message']='No Principal Found Here. Please set principal first or select another variety';
+            $this->json_return($ajax);
+            die();
+        }
         foreach($results as $result)
         {
             $data['principals'][$result['principal_id']]=$result;
