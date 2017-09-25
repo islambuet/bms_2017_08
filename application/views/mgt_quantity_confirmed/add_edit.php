@@ -82,118 +82,118 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <input type="hidden" id="real_variety_total_cogs" name="variety_total_cogs" value="<?php if(isset($variety_total_cogs)){echo $variety_total_cogs;} ?>">
             </div>
         </div>
-    <div class="panel-group" id="accordion">
-    <?php
-        $count=0;
-        foreach($principals as $id=>$principal)
-        {
-            $count++;
-    ?>
-            <div class="panel panel-default" id="principal_container_<?php echo $id;?>">
-                <div class="panel-heading">
-                    <h4 class="panel-title">
-                        <a class="accordion-toggle external" data-toggle="collapse"  data-target="#collapse_<?php echo $id;?>" href="#">
-                            <?php echo "Principal No. $count : ".$principal['principal_name'];?>
-                        </a>
-                    </h4>
-                </div>
-                <div id="collapse_<?php echo $id;?>" class="panel-collapse collapse">
+        <div class="panel-group" id="accordion">
+            <?php
+            $count=0;
+            foreach($principals as $id=>$principal)
+            {
+                $count++;
+                ?>
+                <div class="panel panel-default" id="principal_container_<?php echo $id;?>">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a class="accordion-toggle external" data-toggle="collapse"  data-target="#collapse_<?php echo $id;?>" href="#">
+                                <?php echo "Principal No. $count : ".$principal['principal_name'];?>
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapse_<?php echo $id;?>" class="panel-collapse collapse">
 
-                    <div style="" class="row show-grid">
-                        <div class="col-xs-4">
-                            <label class="control-label pull-right">Principal Name</label>
+                        <div style="" class="row show-grid">
+                            <div class="col-xs-4">
+                                <label class="control-label pull-right">Principal Name</label>
+                            </div>
+                            <div class="col-sm-4 col-xs-8">
+                                <label class="control-label"><?php echo $principal['principal_name'];?></label>
+                            </div>
                         </div>
-                        <div class="col-sm-4 col-xs-8">
-                            <label class="control-label"><?php echo $principal['principal_name'];?></label>
+                        <div style="" class="row show-grid">
+                            <div class="col-xs-4">
+                                <label class="control-label pull-right">Import Name</label>
+                            </div>
+                            <div class="col-sm-4 col-xs-8">
+                                <label class="control-label"><?php echo $principal['name_import'];?></label>
+                            </div>
                         </div>
-                    </div>
-                    <div style="" class="row show-grid">
-                        <div class="col-xs-4">
-                            <label class="control-label pull-right">Import Name</label>
+                        <div style="" class="row show-grid">
+                            <div class="col-xs-4">
+                                <label class="control-label pull-right">Quantity Confirm(kg)</label>
+                            </div>
+                            <div class="col-sm-4 col-xs-8">
+                                <label class="control-label" id="quantity_confirmed_<?php echo $id;?>"><?php if(isset($principal['quantity_total'])){echo $principal['quantity_total'];}else{echo 'Not Assigned';}?></label>
+                                <input type="hidden" id="total_quantity_<?php echo $id;?>" name="items[<?php echo $id;?>][quantity_total]" value="<?php if(isset($principal['quantity_total'])){echo $principal['quantity_total'];}?>">
+                            </div>
                         </div>
-                        <div class="col-sm-4 col-xs-8">
-                            <label class="control-label"><?php echo $principal['name_import'];?></label>
-                        </div>
-                    </div>
-                    <div style="" class="row show-grid">
-                        <div class="col-xs-4">
-                            <label class="control-label pull-right">Quantity Confirm(kg)</label>
-                        </div>
-                        <div class="col-sm-4 col-xs-8">
-                            <label class="control-label" id="quantity_confirmed_<?php echo $id;?>"><?php if(isset($principal['quantity_total'])){echo $principal['quantity_total'];}else{echo 'Not Assigned';}?></label>
-                            <input type="hidden" id="total_quantity_<?php echo $id;?>" name="items[<?php echo $id;?>][quantity_total]" value="<?php if(isset($principal['quantity_total'])){echo $principal['quantity_total'];}?>">
-                        </div>
-                    </div>
 
-                    <div style="" class="row show-grid">
-                        <div class="col-xs-4">
-                            <label class="control-label pull-right">Months</label>
-                        </div>
-                        <div class="col-xs-8">
-                            <div class="row">
-                                <?php
-                                for($i=1;$i<13;$i++)
-                                {
+                        <div style="" class="row show-grid">
+                            <div class="col-xs-4">
+                                <label class="control-label pull-right">Months</label>
+                            </div>
+                            <div class="col-xs-8">
+                                <div class="row">
+                                    <?php
+                                    for($i=1;$i<13;$i++)
+                                    {
+                                        ?>
+                                        <div class="col-xs-1">
+                                            <label class="control-label pull-right"><?php echo date("M", mktime(0, 0, 0,  ($i),1, 2000));?></label>
+                                        </div>
+                                        <div class="col-xs-2">
+                                            <input name="items[<?php echo $id;?>][quantity_<?php echo ($i);?>]" type="text" class="form-control float_type_positive months quantity_month_<?php echo $id;?>" data-principal-id="<?php echo $id;?>" style="float: left;margin-bottom: 5px;" value="<?php if(isset($principal['quantity_'.$i])){echo $principal['quantity_'.$i];}?>">
+                                        </div>
+                                    <?php
+                                    }
                                     ?>
-                                    <div class="col-xs-1">
-                                        <label class="control-label pull-right"><?php echo date("M", mktime(0, 0, 0,  ($i),1, 2000));?></label>
-                                    </div>
-                                    <div class="col-xs-2">
-                                        <input name="items[<?php echo $id;?>][quantity_<?php echo ($i);?>]" type="text" class="form-control float_type_positive months quantity_month_<?php echo $id;?>" data-principal-id="<?php echo $id;?>" style="float: left;margin-bottom: 5px;" value="<?php if(isset($principal['quantity_'.$i])){echo $principal['quantity_'.$i];}?>">
-                                    </div>
-                                <?php
-                                }
-                                ?>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="" class="row show-grid">
+                            <div class="col-xs-4">
+                                <label class="control-label pull-right">Price/KG</label>
+                            </div>
+                            <div class="col-xs-2">
+                                <input id="price_<?php echo $id;?>" name="items[<?php echo $id;?>][unit_price]" type="text" class="form-control float_type_positive price" data-principal-id="<?php echo $id;?>" style="float: left;" value="<?php if(isset($principal['unit_price'])){echo $principal['unit_price'];} ?>">
+                            </div>
+                            <div class="col-xs-2">
+                                <select id="currency_id_<?php echo $id;?>" name="items[<?php echo $id;?>][currency_id]" class="form-control currency_id" data-principal-id="<?php echo $id;?>">
+                                    <?php
+                                    foreach($currencies as $currency)
+                                    {?>
+                                        <option value="<?php echo $currency['value']?>" <?php if(isset($principal['currency_id'])&&($currency['value']==$principal['currency_id'])){ echo "selected";}?>><?php echo $currency['text'];?></option>
+                                    <?php
+                                    }
+                                    ?>
+                                </select>
+                                <input id="currency_rate_<?php echo $id;?>" type="hidden" name="items[<?php echo $id;?>][currency_rate]" value="<?php if(isset($principal['unit_price'])){echo $principal['currency_rate'];} ?>">
+                            </div>
+                        </div>
+
+                        <div style="" class="row show-grid">
+                            <div class="col-xs-4">
+                                <label class="control-label pull-right">COGS</label>
+                            </div>
+                            <div class="col-sm-4 col-xs-8">
+                                <label id="cogs_<?php echo $id;?>" class="control-label"><?php echo number_format($principals[$id]['cogs'],2);?></label>
+                                <input id="sub_cogs_<?php echo $id;?>" type="hidden" name="items[<?php echo $id;?>][cogs]" value="<?php echo $principals[$id]['cogs'];?>">
+                            </div>
+                        </div>
+                        <div style="" class="row show-grid">
+                            <div class="col-xs-4">
+                                <label class="control-label pull-right">Total COGS</label>
+                            </div>
+                            <div class="col-sm-4 col-xs-8">
+                                <label id="total_cogs_<?php echo $id;?>" class="control-label"><?php echo number_format($principals[$id]['total_cogs'],2);?></label>
+                                <input id="real_total_cogs_<?php echo $id;?>" class="sub_total_cogs" type="hidden" name="items[<?php echo $id;?>][total_cogs]" value="<?php echo $principals[$id]['total_cogs'];?>">
                             </div>
                         </div>
                     </div>
-
-                    <div style="" class="row show-grid">
-                        <div class="col-xs-4">
-                            <label class="control-label pull-right">Price/KG</label>
-                        </div>
-                        <div class="col-xs-2">
-                            <input id="price_<?php echo $id;?>" name="items[<?php echo $id;?>][unit_price]" type="text" class="form-control float_type_positive price" data-principal-id="<?php echo $id;?>" style="float: left;" value="<?php if(isset($principal['unit_price'])){echo $principal['unit_price'];} ?>">
-                        </div>
-                        <div class="col-xs-2">
-                            <select id="currency_id_<?php echo $id;?>" name="items[<?php echo $id;?>][currency_id]" class="form-control currency_id" data-principal-id="<?php echo $id;?>">
-                                <?php
-                                foreach($currencies as $currency)
-                                {?>
-                                    <option value="<?php echo $currency['value']?>" <?php if(isset($principal['currency_id'])&&($currency['value']==$principal['currency_id'])){ echo "selected";}?>><?php echo $currency['text'];?></option>
-                                <?php
-                                }
-                                ?>
-                            </select>
-                            <input id="currency_rate_<?php echo $id;?>" type="hidden" name="items[<?php echo $id;?>][currency_rate]" value="">
-                        </div>
-                    </div>
-
-                    <div style="" class="row show-grid">
-                        <div class="col-xs-4">
-                            <label class="control-label pull-right">COGS</label>
-                        </div>
-                        <div class="col-sm-4 col-xs-8">
-                            <label id="cogs_<?php echo $id;?>" class="control-label"><?php echo number_format($principals[$id]['cogs'],2);?></label>
-                            <input id="sub_cogs_<?php echo $id;?>" type="hidden" name="items[<?php echo $id;?>][cogs]" value="<?php echo $principals[$id]['cogs'];?>">
-                        </div>
-                    </div>
-                    <div style="" class="row show-grid">
-                        <div class="col-xs-4">
-                            <label class="control-label pull-right">Total COGS</label>
-                        </div>
-                        <div class="col-sm-4 col-xs-8">
-                            <label id="total_cogs_<?php echo $id;?>" class="control-label"><?php echo number_format($principals[$id]['total_cogs'],2);?></label>
-                            <input id="real_total_cogs_<?php echo $id;?>" class="sub_total_cogs" type="hidden" name="items[<?php echo $id;?>][total_cogs]" value="<?php echo $principals[$id]['total_cogs'];?>">
-                        </div>
-                    </div>
                 </div>
-            </div>
 
-    <?php
-        }
-    ?>
-    </div>
+            <?php
+            }
+            ?>
+        </div>
     </div>
 </form>
 
@@ -217,25 +217,29 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
     function calculate_total(principal_id)
     {
         var principal_id = principal_id;
-        var quantity_confirmed=0;
+        var total_quantity=0;
         var cogs=0;
+        var total_cogs=0;
         var main_total_cogs=0;
         $("#quantity_confirmed_"+principal_id).html("-");
+        $("#total_quantity_"+principal_id).val(total_quantity);
         $("#cogs_"+principal_id).html("-");
+        $("#sub_cogs_"+principal_id).val(cogs);
         $("#total_cogs_"+principal_id).html("-");
+        $("#real_total_cogs_"+principal_id).val(total_cogs);
 
         $(".quantity_month_"+principal_id).each( function( index, element )
         {
             var month_quantity=parseFloat($(this).val());
             if(month_quantity>0)
             {
-                quantity_confirmed+=month_quantity;
+                total_quantity+=month_quantity;
             }
         });
-        if(quantity_confirmed>0)
+        if(total_quantity>0)
         {
-            $("#quantity_confirmed_"+principal_id).html(number_format(quantity_confirmed,3,'.',''));
-            $("#total_quantity_"+principal_id).val(quantity_confirmed);
+            $("#quantity_confirmed_"+principal_id).html(number_format(total_quantity,3,'.',''));
+            $("#total_quantity_"+principal_id).val(total_quantity);
         }
         var price=parseFloat($("#price_"+principal_id).val());
         var currency_id=$("#currency_id_"+principal_id).val();
@@ -246,10 +250,10 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             $("#cogs_"+principal_id).html(number_format(cogs,2));
             $("#sub_cogs_"+principal_id).val(cogs);
             $("#currency_rate_"+principal_id).val(window['currency_'+currency_id]);
-            if(quantity_confirmed>0)
+            if(total_quantity>0)
             {
-                $("#total_cogs_"+principal_id).html(number_format(cogs*quantity_confirmed,2));
-                $("#real_total_cogs_"+principal_id).val(cogs*quantity_confirmed);
+                $("#total_cogs_"+principal_id).html(number_format(cogs*total_quantity,2));
+                $("#real_total_cogs_"+principal_id).val(cogs*total_quantity);
             }
         }
         $('.sub_total_cogs').each(function(index,element)
