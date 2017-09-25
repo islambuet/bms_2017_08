@@ -117,13 +117,12 @@ class Mgt_quantity_confirmed extends Root_Controller
             $data['quantity_expected']='N/A';
         }
         $data['variety']=Query_helper::get_info($this->config->item('table_login_setup_classification_varieties'),array('name'),array('id ='.$reports['variety_id']),1);
-        $data['currencies']=Query_helper::get_info($this->config->item('table_bms_setup_currency'),array('id value','name text'),array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC'));
-        //currency rates
-        $rates=Query_helper::get_info($this->config->item('table_bms_setup_currency_rate'),'*',array('status !="'.$this->config->item('system_status_delete').'"','fiscal_year_id ='.$reports['year_id']));
+        //currency and rates
+        $data['currencies']=Query_helper::get_info($this->config->item('table_bms_setup_currency'),array('id value','name text','amount_rate_budget'),array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC'));
         $data['currency_rates']=array();
-        foreach($rates as $rate)
+        foreach($data['currencies'] as $rate)
         {
-            $data['currency_rates'][$rate['currency_id']]=$rate['rate'];
+            $data['currency_rates'][$rate['value']]=$rate['amount_rate_budget'];
         }
 
         //Confirmed data from principals
@@ -209,6 +208,16 @@ class Mgt_quantity_confirmed extends Root_Controller
             $check_direct_cost=round(($this->input->post('direct_costs_percentage')*100),2);
             $data['main']['variety_total_cogs']=$this->input->post('variety_total_cogs');
             $data['details']=$this->input->post('items');
+
+            //present currency rates
+            $results=Query_helper::get_info($this->config->item('table_bms_setup_currency'),array('id value','name text','amount_rate_budget'),array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC'));
+            $currency_rates=array();
+            foreach($results as $rate)
+            {
+                $currency_rates[$rate['value']]=$rate['amount_rate_budget'];
+            }
+
+
             //month wise total quantity
             foreach($data['details'] as $principal_id=>&$item)
             {
@@ -227,7 +236,19 @@ class Mgt_quantity_confirmed extends Root_Controller
                 {
                     $item['currency_id']='';
                 }
+                else
+                {
+                    if($item['currency_rate']!=$currency_rates[$item['currency_id']])
+                    {
+                        $ajax['status']=true;
+                        $ajax['system_message']='Some data changes in setup menu...Please Load Again';
+                        $this->json_return($ajax);
+                        die();
+                    };
+                }
             }
+
+
             $results=$results=Query_helper::get_info($this->config->item('table_bms_setup_direct_cost_items'),array('id','percentage'),array('status !="'.$this->config->item('system_status_delete').'"'),0,0);
             if($results)
             {

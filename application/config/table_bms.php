@@ -5,7 +5,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 //Market Size
 $config['table_bms_setup_market_size'] = 'arm_bms_2017_08.bms_setup_market_size';
 $config['table_bms_setup_currency'] = 'arm_bms_2017_08.bms_setup_currency';
-$config['table_bms_setup_currency_rate'] = 'arm_bms_2017_08.bms_setup_currency_rate';
 
 //Direct Cost Item Setup
 $config['table_bms_setup_direct_cost_items'] = 'arm_bms_2017_08.bms_setup_direct_cost_items';

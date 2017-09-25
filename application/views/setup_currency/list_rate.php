@@ -65,7 +65,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             dataFields: [
                 { name: 'id', type: 'int' },
                 { name: 'name', type: 'string' },
-                { name: 'rate', type: 'string' }
+                { name: 'amount_rate_budget', type: 'string' }
             ],
             id: 'id',
             url: url,
@@ -91,7 +91,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 autoheight: true,
                 columns: [
                     { text: 'Fiscal Year', dataField: 'name',width:'60%'},
-                    { text: 'Rate', dataField: 'rate',width:'40%',cellsalign: 'right'}
+                    { text: 'Rate', dataField: 'amount_rate_budget',width:'40%',cellsalign: 'right'}
                 ]
             });
     });

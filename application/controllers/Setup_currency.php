@@ -65,7 +65,7 @@ class Setup_currency extends Root_Controller
     private function system_get_items()
     {
         $this->db->from($this->config->item('table_bms_setup_currency'));
-        $this->db->select('id,name,symbol,rate,status,ordering');
+        $this->db->select('id,name,symbol,amount_rate_budget,status,ordering');
         $this->db->order_by('ordering','ASC');
         $this->db->where('status !=',$this->config->item('system_status_delete'));
         $items=$this->db->get()->result_array();
@@ -80,7 +80,7 @@ class Setup_currency extends Root_Controller
                 'id' => 0,
                 'name' => '',
                 'symbol' => '',
-                'rate' => '',
+                'amount_rate_budget' => '',
                 'description' => '',
                 'ordering' => 99,
                 'status' => $this->config->item('system_status_active')
@@ -177,7 +177,7 @@ class Setup_currency extends Root_Controller
                 $this->db->where('id',$id);
                 $this->db->set('name',$data['name']);
                 $this->db->set('symbol',$data['symbol']);
-                $this->db->set('rate',$data['rate']);
+                $this->db->set('amount_rate_budget',$data['amount_rate_budget']);
                 $this->db->set('description',$data['description']);
                 $this->db->set('ordering',$data['ordering']);
                 $this->db->set('status',$data['status']);
@@ -218,7 +218,7 @@ class Setup_currency extends Root_Controller
     {
         $this->load->library('form_validation');
         $this->form_validation->set_rules('item[name]',$this->lang->line('LABEL_NAME'),'required');
-        $this->form_validation->set_rules('item[rate]',$this->lang->line('LABEL_CURRENCY_RATE'),'required');
+        $this->form_validation->set_rules('item[amount_rate_budget]',$this->lang->line('LABEL_CURRENCY_RATE'),'required');
         $this->form_validation->set_rules('item[ordering]',$this->lang->line('LABEL_ORDER'),'required');
         $this->form_validation->set_rules('item[status]',$this->lang->line('STATUS'),'required');
         if($this->form_validation->run() == FALSE)

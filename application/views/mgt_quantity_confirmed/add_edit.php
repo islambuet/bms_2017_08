@@ -271,6 +271,16 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 
     jQuery(document).ready(function()
     {
+        <?php
+            foreach($principals as $id=>$principal)
+            {
+        ?>
+                calculate_total(<?php echo $id;?>);
+       <?php
+            }
+        ?>
+
+
         $(document).off("change", ".price");
         $(document).off("change", ".currency_id");
         $(document).off("change", ".months");
