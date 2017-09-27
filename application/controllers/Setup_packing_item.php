@@ -77,7 +77,7 @@ class Setup_packing_item extends Root_Controller
     private function system_get_items()
     {
     	$this->db->select('pt.*');
-        $this->db->select('SUM(CASE WHEN ptc.cost>0 THEN 1 ELSE 0 END) no_of_variety');
+        $this->db->select('SUM(CASE WHEN ptc.amount_cost_budget>0 THEN 1 ELSE 0 END) no_of_variety');
     	$this->db->from($this->config->item('table_bms_setup_packing_items').' pt');
     	$this->db->join($this->config->item('table_bms_setup_packing_items_cost').' ptc','ptc.packing_item_id=pt.id','LEFT');
     	$this->db->where('pt.status!=',$this->config->item('system_status_delete'));
@@ -195,12 +195,12 @@ class Setup_packing_item extends Root_Controller
     	$id=$this->input->post('id');
 
     	$this->db->select('v.id,v.name variety_name');
-    	$this->db->select('cost.cost');
+    	$this->db->select('amount_cost_budget.amount_cost_budget');
     	$this->db->select('crop.name crop_name');
     	$this->db->select('type.name crop_type_name');
 
     	$this->db->from($this->config->item('table_login_setup_classification_varieties').' v');
-    	$this->db->join($this->config->item('table_bms_setup_packing_items_cost').' cost','cost.variety_id=v.id AND cost.packing_item_id='.$id,'LEFT');
+    	$this->db->join($this->config->item('table_bms_setup_packing_items_cost').' amount_cost_budget','amount_cost_budget.variety_id=v.id AND amount_cost_budget.packing_item_id='.$id,'LEFT');
     	$this->db->join($this->config->item('table_login_setup_classification_crop_types').' type','type.id=v.crop_type_id','INNER');
     	$this->db->join($this->config->item('table_login_setup_classification_crops').' crop','crop.id=type.crop_id','INNER');
 
@@ -214,9 +214,9 @@ class Setup_packing_item extends Root_Controller
     	$items=$this->db->get()->result_array();
     	foreach($items as &$item)
     	{
-    		if($item['cost']==0)
+    		if($item['amount_cost_budget']==0)
     		{
-    			$item['cost']=0;
+    			$item['amount_cost_budget']=0;
     		}
     	}
         $this->json_return($items);
@@ -307,11 +307,11 @@ class Setup_packing_item extends Root_Controller
             $this->json_return($ajax);
         }
         $items=$this->input->post('items');
-        $results=Query_helper::get_info($this->config->item('table_bms_setup_packing_items_cost'),array('variety_id','cost'),array('packing_item_id='.$id));
+        $results=Query_helper::get_info($this->config->item('table_bms_setup_packing_items_cost'),array('variety_id','amount_cost_budget'),array('packing_item_id='.$id));
         $items_current=array();
         foreach($results as $result)
         {
-        	$items_current[$result['variety_id']]=$result['cost'];
+        	$items_current[$result['variety_id']]=$result['amount_cost_budget'];
         }
 
         $data_add=array(
@@ -322,14 +322,14 @@ class Setup_packing_item extends Root_Controller
         );
         $this->db->trans_start();  //DB Transaction Handle START
 
-        foreach($items as $variety_id=>$cost)
+        foreach($items as $variety_id=>$amount_cost_budget)
         {
         	if(isset($items_current[$variety_id]))
         	{
-        		if($items_current[$variety_id]!=$cost)
+        		if($items_current[$variety_id]!=$amount_cost_budget)
         		{
-        			$this->db->set('cost',$cost);
-        			$this->db->set('revision_cost','revision_cost+1',false);
+        			$this->db->set('amount_cost_budget',$amount_cost_budget);
+        			$this->db->set('revision_amount_cost_budget','revision_amount_cost_budget+1',false);
         			$this->db->set('date_updated',$time);
         			$this->db->set('user_updated',$user->user_id);
 
@@ -341,10 +341,10 @@ class Setup_packing_item extends Root_Controller
         	}
         	else
         	{
-        		if($cost>0)
+        		if($amount_cost_budget>0)
                 {
                     $data_add['variety_id']=$variety_id;
-                    $data_add['cost']=$cost;
+                    $data_add['amount_cost_budget']=$amount_cost_budget;
                     Query_helper::add($this->config->item('table_bms_setup_packing_items_cost'),$data_add);
                 }
         	}
