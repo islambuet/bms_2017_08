@@ -39,5 +39,5 @@ $config['table_bms_mgt_quantity_confirm_details'] = 'arm_bms_2017_08.bms_mgt_qua
 $config['table_bms_setup_packing_items'] = 'arm_bms_2017_08.bms_setup_packing_items';
 $config['table_bms_setup_packing_items_cost'] = 'arm_bms_2017_08.bms_setup_packing_items_cost';
 
-//TI Monthwise target
-$config['table_bms_ti_monthwise_target'] = 'arm_bms_2017_08.bms_ti_monthwise_target';
+//TI target month
+$config['table_bms_ti_target_month'] = 'arm_bms_2017_08.bms_ti_target_month';

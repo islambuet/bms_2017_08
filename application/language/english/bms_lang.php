@@ -1,5 +1,4 @@
 <?php
-
 //login
 $lang['MSG_USERNAME_PASSWORD_INVALID'] = 'Username and Password did not match or Invalid';
 $lang['MSG_LOGIN_SUCCESS'] = 'Successfully Logged In';
@@ -213,3 +212,6 @@ $lang['LABEL_MONTH_9'] = 'September';
 $lang['LABEL_MONTH_10'] = 'October';
 $lang['LABEL_MONTH_11'] = 'November';
 $lang['LABEL_MONTH_12'] = 'December';
+
+//TI Target
+$lang['LABEL_TI_TARGET']='TI Target';
