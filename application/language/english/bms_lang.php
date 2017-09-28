@@ -215,3 +215,6 @@ $lang['LABEL_MONTH_12'] = 'December';
 
 //TI Target
 $lang['LABEL_TI_TARGET']='TI Target';
+
+//Quantity Confirmed warning
+$lang['MSG_QC_EDIT_WARNING'] = 'If currency price, packing or direct cost changed, please save this budget again to get lastest COGS and Total COGS.';
