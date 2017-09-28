@@ -233,16 +233,15 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                     foreach($years_previous as $year)
                     {
                         ?>
-                //{ name: 'year<?php echo $year['value']; ?>_month<?php echo $i; ?>_quantity_target', type: 'string' },
-                { name: 'year<?php echo $year['value']; ?>_month<?php echo $i; ?>_sell_quantity', type: 'string' },
-                <?php
-            }
-            ?>
-                { name: 'month<?php echo $i; ?>_quantity_target', type: 'string' },
-                { name: 'month<?php echo $i; ?>_quantity_target_editable', type: 'string' },
-                <?php
-            }
-            ?>
+                        { name: 'year<?php echo $year['value']; ?>_month<?php echo $i; ?>_sell_quantity', type: 'string' },
+                        <?php
+                    }
+                    ?>
+                    { name: 'month<?php echo $i; ?>_quantity_target', type: 'string' },
+                    { name: 'month<?php echo $i; ?>_quantity_target_editable', type: 'string' },
+                    <?php
+                }
+                ?>
             ],
             id: 'id',
             url: url,
@@ -290,57 +289,48 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                             foreach($years_previous as $year)
                             {
                                 ?>
-                   // { columngroup: 'year<?php echo $year['value']; ?>_month<?php echo $current_month; ?>',text: 'Target', dataField: 'year<?php echo $year['value']; ?>_month<?php echo $current_month; ?>_quantity_target',width:'65',align:'center',cellsAlign:'right',cellsrenderer: cellsrenderer,editable:false},
-                    { columngroup: 'year<?php echo $year['value']; ?>_month<?php echo $current_month; ?>',text: 'Achieved', dataField: 'year<?php echo $year['value']; ?>_month<?php echo $current_month; ?>_sell_quantity',width:'65',align:'center',cellsAlign:'right',cellsrenderer: cellsrenderer,editable:false},
-                    <?php
-                }
-                ?>
-                    { columngroup: 'current_year_month<?php echo $current_month; ?>',text: 'Target', dataField: 'month<?php echo $current_month; ?>_quantity_target',width:'100',align:'center',cellsAlign:'right',cellsrenderer: cellsrenderer,columntype:'custom',
-                        cellbeginedit: function (row) {
-                            var selectedRowData = $('#system_jqx_container').jqxGrid('getrowdata', row);//only last selected
-                            return selectedRowData['month<?php echo $current_month; ?>_quantity_target_editable'];
-                        },
-                        initeditor: function (row, cellvalue, editor, celltext, pressedkey) {
-                            editor.html('<div style="margin: 0px;width: 100%;height: 100%;padding: 5px;"><input type="text" value="'+cellvalue+'" class="jqxgrid_input float_type_positive"><div>');
-                        },
-                        geteditorvalue: function (row, cellvalue, editor) {
-                            // return the editor's value.
-                            var value=editor.find('input').val();
-                            var selectedRowData = $('#system_jqx_container').jqxGrid('getrowdata', row);
-                            return editor.find('input').val();
+                                { columngroup: 'previous_year_month<?php echo $current_month; ?>',text: '<?php echo $year['text']; ?>', dataField: 'year<?php echo $year['value']; ?>_month<?php echo $current_month; ?>_sell_quantity',width:'65',align:'center',cellsAlign:'right',cellsrenderer: cellsrenderer,editable:false},
+                                <?php
+                            }
+                            ?>
+                            { columngroup: 'month<?php echo $current_month; ?>',text: 'Curr. Yr. Target', dataField: 'month<?php echo $current_month; ?>_quantity_target',width:'100',align:'center',cellsAlign:'right',cellsrenderer: cellsrenderer,columntype:'custom',
+                                cellbeginedit: function (row) {
+                                    var selectedRowData = $('#system_jqx_container').jqxGrid('getrowdata', row);//only last selected
+                                    return selectedRowData['month<?php echo $current_month; ?>_quantity_target_editable'];
+                                },
+                                initeditor: function (row, cellvalue, editor, celltext, pressedkey) {
+                                    editor.html('<div style="margin: 0px;width: 100%;height: 100%;padding: 5px;"><input type="text" value="'+cellvalue+'" class="jqxgrid_input float_type_positive"><div>');
+                                },
+                                geteditorvalue: function (row, cellvalue, editor) {
+                                    // return the editor's value.
+                                    var value=editor.find('input').val();
+                                    var selectedRowData = $('#system_jqx_container').jqxGrid('getrowdata', row);
+                                    return editor.find('input').val();
+                                }
+                            },
+                            <?php
                         }
-                    },
-                    <?php
-                }
-            ?>
+                    ?>
                 ],
                 columngroups:[
                     <?php
                     for($i=0;$i<12;$i++)
                     {
                         if(($starting_month+$i)>12)
-                            {
-                                $current_month=$starting_month+$i-12;
-                            }
-                            else
-                            {
-                                $current_month=$starting_month+$i;
-                            }
-
-                            $month_name=$this->lang->line('LABEL_MONTH_'.$current_month);
-                        foreach($years_previous as $year)
                         {
-                            ?>
-                    { parentgroup: 'previous_year_month<?php echo $current_month; ?>',text: '<?php echo $year['text']; ?>', align: 'center', name: 'year<?php echo $year['value']; ?>_month<?php echo $current_month; ?>' },
-                    <?php
-                }
-                ?>
-                    { parentgroup: 'month<?php echo $current_month; ?>',text: 'Previous Year Achieved', align: 'center', name: 'previous_year_month<?php echo $current_month; ?>' },
-                    { parentgroup: 'month<?php echo $current_month; ?>',text: 'Current Year', align: 'center', name: 'current_year_month<?php echo $current_month; ?>' },
-                    { text: '<?php echo $month_name; ?>', align: 'center', name: 'month<?php echo $current_month; ?>' },
-                    <?php
-                }
-                ?>
+                            $current_month=$starting_month+$i-12;
+                        }
+                        else
+                        {
+                            $current_month=$starting_month+$i;
+                        }
+                        $month_name=$this->lang->line('LABEL_MONTH_'.$current_month);
+                        ?>
+                        { parentgroup: 'month<?php echo $current_month; ?>',text: 'Prev. Yr. Achieved', align: 'center', name: 'previous_year_month<?php echo $current_month; ?>' },
+                        { text: '<?php echo $month_name; ?>', align: 'center', name: 'month<?php echo $current_month; ?>' },
+                        <?php
+                    }
+                    ?>
                 ]
             });
     });

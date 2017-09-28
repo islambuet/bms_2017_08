@@ -190,7 +190,7 @@ class Ti_target_month extends Root_Controller
             }
         }
         $data['title']='TI Month Target';
-        $data['years_previous']=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id <'.$reports['year_id']),$this->config->item('num_year_previous_sell'),0,array('id ASC'));
+        $data['years_previous']=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id <'.$reports['year_id']),$this->config->item('num_year_previous_sell'),0,array('id DESC'));
         $data['year_current']=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text','date_start','date_end'),array('status ="'.$this->config->item('system_status_active').'"','id ='.$reports['year_id']),1,0,array('id ASC'));
         $start_month=date('n',$data['year_current']['date_start']);
         $data['starting_month']=$start_month;
@@ -209,7 +209,7 @@ class Ti_target_month extends Root_Controller
         $crop_type_id=$this->input->post('crop_type_id');
         $territory_id=$this->input->post('territory_id');
         $zone_id=$this->input->post('zone_id');
-        $years_previous=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id <'.$year_id),$this->config->item('num_year_previous_sell'),0,array('id ASC'));
+        $years_previous=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"','id <'.$year_id),$this->config->item('num_year_previous_sell'),0,array('id DESC'));
         $year_current=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text','date_start','date_end'),array('status ="'.$this->config->item('system_status_active').'"','id ='.$year_id),1,0,array('id ASC'));
 
         //getting TI assign target current year data(When ZI assign target to TI)
@@ -252,20 +252,6 @@ class Ti_target_month extends Root_Controller
         foreach($results as $result)
         {
             $items_current_ti[$result['variety_id']]=$result;
-        }
-
-        //getting TI previous years data(From Month Target)
-        $items_previous_years=array();
-        $this->db->from($this->config->item('table_bms_ti_target_month').' mt');
-        $this->db->select('mt.*');
-        $this->db->where('year_id',($year_id-1));
-        $this->db->where('territory_id',$territory_id);
-        $this->db->join($this->config->item('table_login_setup_classification_varieties').' v','v.id = mt.variety_id','INNER');
-        $this->db->where('v.crop_type_id',$crop_type_id);
-        $results=$this->db->get()->result_array();
-        foreach($results as $result)
-        {
-            $items_previous_years[$result['variety_id']][$result['year_id']]=$result;
         }
 
         //getting ti month target forward data(current year)
