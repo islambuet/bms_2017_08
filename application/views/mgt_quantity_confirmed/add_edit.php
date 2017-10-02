@@ -13,7 +13,7 @@ if(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))
 }
 $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 ?>
-<?php if($variety_total_cogs>0){?>
+<?php if($cogs_total>0){?>
 <div class="alert alert-warning">
     <?php echo $CI->lang->line('MSG_QC_EDIT_WARNING'); ?>
 </div>
@@ -83,7 +83,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <label class="control-label pull-right">Confirmed Total Quantity</label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <label id="total_quantity_confirmed" class="control-label"><?php if(isset($confirmed_total_quantity)){echo number_format($confirmed_total_quantity,3);} else{echo '0.000';}?></label>
+                <label id="total_quantity_confirmed" class="control-label"><?php if(isset($quantity_confirmed_total)){echo number_format($quantity_confirmed_total,3);} else{echo '0.000';}?></label>
             </div>
         </div>
         <div style="" class="row show-grid">
@@ -91,7 +91,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <label class="control-label pull-right">Variety Wise Total COGS</label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <label id="variety_total_cogs" class="control-label"><?php if(isset($variety_total_cogs)){echo number_format($variety_total_cogs,2);} else{echo '0.00';}?></label>
+                <label id="variety_total_cogs" class="control-label"><?php if(isset($cogs_total)){echo number_format($cogs_total,2);} else{echo '0.00';}?></label>
             </div>
         </div>
         <div class="panel-group" id="accordion">
@@ -164,7 +164,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                                 <label class="control-label pull-right">Price/KG</label>
                             </div>
                             <div class="col-xs-2">
-                                <input id="price_<?php echo $id;?>" name="items[<?php echo $id;?>][unit_price]" type="text" class="form-control float_type_positive price" data-principal-id="<?php echo $id;?>" style="float: left;" value="<?php if(isset($item['unit_price'])){echo $item['unit_price'];}?>">
+                                <input id="price_<?php echo $id;?>" name="items[<?php echo $id;?>][price_unit]" type="text" class="form-control float_type_positive price" data-principal-id="<?php echo $id;?>" style="float: left;" value="<?php if(isset($item['price_unit'])){echo $item['price_unit'];}?>">
                             </div>
                             <div class="col-xs-2">
                                 <select id="currency_id_<?php echo $id;?>" name="items[<?php echo $id;?>][currency_id]" class="form-control currency_id" data-principal-id="<?php echo $id;?>">
@@ -184,7 +184,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                                 <label class="control-label pull-right">COGS</label>
                             </div>
                             <div class="col-sm-4 col-xs-8">
-                                <label id="cogs_<?php echo $id;?>" class="control-label"><?php if(isset($item['cogs'])){echo number_format($item['cogs'],2);} else{echo '0.00';}?></label>
+                                <label id="cogs_<?php echo $id;?>" class="control-label"><?php if(isset($item['cogs_kg'])){echo number_format($item['cogs_kg'],2);} else{echo '0.00';}?></label>
                             </div>
                         </div>
                         <div style="" class="row show-grid">
@@ -192,7 +192,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                                 <label class="control-label pull-right">Total COGS</label>
                             </div>
                             <div class="col-sm-4 col-xs-8">
-                                <label id="total_cogs_<?php echo $id;?>" class="control-label sub_total_cogs"><?php if(isset($item['total_cogs'])){echo number_format($item['total_cogs'],2);} else{echo '0.00';}?></label>
+                                <label id="total_cogs_<?php echo $id;?>" class="control-label sub_total_cogs"><?php if(isset($item['cogs_total'])){echo number_format($item['cogs_total'],2);} else{echo '0.00';}?></label>
                             </div>
                         </div>
                     </div>
@@ -209,7 +209,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 
     var direct_costs_percentage=<?php echo $direct_costs_percentage; ?>;
     var packing_cost=<?php echo $packing_cost; ?>;
-
+    var currencies=JSON.parse('<?php echo json_encode($currency_rates);?>');
     function calculate_total(principal_id)
     {
         var principal_id = principal_id;
@@ -244,14 +244,13 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 total_quantity_confirmed+=parseFloat(st_quantity);
             });
             $('#total_quantity_confirmed').html(number_format(total_quantity_confirmed,3,'.',','));
-
         }
 
         var price=parseFloat($("#price_"+principal_id).val());
         var currency_id=$("#currency_id_"+principal_id).val();
         if(price>0)
         {
-            var unit_price=price*system_currencies[currency_id];
+            var unit_price=price*currencies[currency_id];
             var cogs=unit_price+unit_price*direct_costs_percentage+packing_cost;
             $("#cogs_"+principal_id).html(number_format(cogs,2));
             if(total_quantity>0)

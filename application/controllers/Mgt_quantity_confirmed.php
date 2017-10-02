@@ -133,11 +133,12 @@ class Mgt_quantity_confirmed extends Root_Controller
         $this->db->select('p.name principal_name');
         $this->db->join($this->config->item('table_login_basic_setup_principal').' p','p.id = vp.principal_id','INNER');
         $this->db->where('p.status!=',$this->config->item('system_status_delete'));
-        $this->db->select('confirm.variety_total_cogs,confirm.confirmed_total_quantity');
+        $this->db->select('confirm.cogs_total cogs_total_variety,confirm.quantity_confirmed_total');
         $this->db->join($this->config->item('table_bms_mgt_quantity_confirm').' confirm','confirm.variety_id = '.$reports['variety_id'].' and confirm.fiscal_year_id = '.$reports['year_id'],'LEFT');
-        $this->db->select('details.currency_id,details.currency_rate,details.unit_price,details.cogs,details.total_cogs,details.quantity_total,details.quantity_1,details.quantity_2,details.quantity_3,details.quantity_4,details.quantity_5,details.quantity_6,details.quantity_7,details.quantity_8,details.quantity_9,details.quantity_10,details.quantity_11,details.quantity_12');
+        $this->db->select('details.currency_id,details.amount_rate_budget,details.price_unit,details.cogs_kg,details.cogs_total,details.quantity_total,details.quantity_1,details.quantity_2,details.quantity_3,details.quantity_4,details.quantity_5,details.quantity_6,details.quantity_7,details.quantity_8,details.quantity_9,details.quantity_10,details.quantity_11,details.quantity_12');
         $this->db->join($this->config->item('table_bms_mgt_quantity_confirm_details').' details','details.parent_id = confirm.id and details.principal_id = vp.principal_id','LEFT');
         $results=$this->db->get()->result_array();
+        //print_r($results);exit;
         if(!$results)
         {
             $ajax['status']=false;
@@ -148,8 +149,8 @@ class Mgt_quantity_confirmed extends Root_Controller
         foreach($results as $result)
         {
             $data['items'][$result['principal_id']]=$result;
-            $data['variety_total_cogs']=$data['items'][$result['principal_id']]['variety_total_cogs'];
-            $data['confirmed_total_quantity']=$data['items'][$result['principal_id']]['confirmed_total_quantity'];
+            $data['cogs_total']=$data['items'][$result['principal_id']]['cogs_total_variety'];
+            $data['quantity_confirmed_total']=$data['items'][$result['principal_id']]['quantity_confirmed_total'];
         }
         //direct cost
         $result=$results=Query_helper::get_info($this->config->item('table_bms_setup_direct_cost_items'),array('SUM(percentage) total_percentage'),array('status !="'.$this->config->item('system_status_delete').'"'),1);
@@ -179,7 +180,6 @@ class Mgt_quantity_confirmed extends Root_Controller
         {
             $ajax['system_message']=$this->message;
         }
-        //print_r($data);
         $this->json_return($ajax);
     }
     private function system_save()
@@ -195,45 +195,33 @@ class Mgt_quantity_confirmed extends Root_Controller
             $results=$results=Query_helper::get_info($this->config->item('table_bms_setup_direct_cost_items'),array('id','percentage'),array('status !="'.$this->config->item('system_status_delete').'"'),0,0);
             if($results)
             {
+                $direct_costs['direct_cost_percentage_total']=0;
                 foreach($results as $result)
                 {
-                    if(isset($direct_costs['direct_cost_total']))
-                    {
-                        $direct_costs['direct_cost_total']+=$result['percentage'];
-                    }
-                    else
-                    {
-                        $direct_costs['direct_cost_total']=$result['percentage'];
-                    }
+                    $direct_costs['direct_cost_percentage_total']+=$result['percentage'];
                 }
-                $direct_costs['direct_cost_content']=json_encode($results);
+                $direct_costs['details_direct_cost']=json_encode($results);
             }
             else
             {
-                $direct_costs['direct_cost_content']=null;
-                $direct_costs['direct_cost_total']=0;
+                $direct_costs['details_direct_cost']=null;
+                $direct_costs['direct_cost_percentage_total']=0;
             }
             //packing items cost
             $results=Query_helper::get_info($this->config->item('table_bms_setup_packing_items_cost'),array('packing_item_id,amount_cost_budget'),array('variety_id ='.$variety_id),0,0);
             if($results)
             {
+                $packs['pack_total_kg']=0;
                 foreach($results as $result)
                 {
-                    if(isset($packs['pack_total']))
-                    {
-                        $packs['pack_total']+=$result['amount_cost_budget'];
-                    }
-                    else
-                    {
-                        $packs['pack_total']=$result['amount_cost_budget'];
-                    }
+                    $packs['pack_total_kg']+=$result['amount_cost_budget'];
                 }
-                $packs['pack_content']=json_encode($results);
+                $packs['details_pack']=json_encode($results);
             }
             else
             {
-                $packs['pack_content']=null;
-                $packs['pack_total']=0;
+                $packs['details_pack']=null;
+                $packs['pack_total_kg']=0;
             }
             //present currency rates
             $results=Query_helper::get_info($this->config->item('table_bms_setup_currency'),array('id value','name text','amount_rate_budget'),array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC'));
@@ -256,108 +244,67 @@ class Mgt_quantity_confirmed extends Root_Controller
                 $items_current[$result['principal_id']]=$result;
                 $parent_id=$result['parent_id'];
             }
-//            $current_main=array();
-//            $current_details=array();
-//            $result=Query_helper::get_info($this->config->item('table_bms_mgt_quantity_confirm'),array('*'),array('fiscal_year_id ='.$fiscal_year_id,'variety_id ='.$variety_id),1);
-//            if($result)
-//            {
-//                $current_main[$result['id']]=$result;
-//                $results=Query_helper::get_info($this->config->item('table_bms_mgt_quantity_confirm_details'),array('*'),array('parent_id ='.$result['id']),0,0);
-//                foreach($results as $result)
-//                {
-//                    $current_details[$result['parent_id']][$result['principal_id']]=$result;
-//                }
-//            }
 
             $new_main=array();
+            $new_main['variety_id']=$variety_id;
+            $new_main['fiscal_year_id']=$fiscal_year_id;
+            $new_main['pack_total_kg']=$packs['pack_total_kg'];
+            $new_main['details_pack']=$packs['details_pack'];
+            $new_main['direct_cost_percentage_total']=$direct_costs['direct_cost_percentage_total'];
+            $new_main['details_direct_cost']=$direct_costs['details_direct_cost'];
             $new_details=array();
+
+            $new_main['cogs_total']=0;
+            $new_main["quantity_confirmed_total"]=0;
+            for($i=1;$i<13;$i++)
+            {
+                $new_main["quantity_$i"]=0;
+            }
             foreach($items as $principal_id=>$item)
             {
-                $new_main['variety_id']=$variety_id;
-                $new_main['fiscal_year_id']=$fiscal_year_id;
-                $new_main['pack_total']=$packs['pack_total'];
-                $new_main['pack_content']=$packs['pack_content'];
-                $new_main['direct_cost_total']=$direct_costs['direct_cost_total'];
-                $new_main['direct_cost_content']=$direct_costs['direct_cost_content'];
-
                 $new_details[$principal_id]['principal_id']=$principal_id;
+                $new_details[$principal_id]['currency_id']=$item['currency_id'];
+                $new_details[$principal_id]['amount_rate_budget']=$currency_rates[$item['currency_id']];
                 //principal wise currency rate & Currency id && unit price
-                $new_details[$principal_id]['unit_price']=$item['unit_price'];
-                if($new_details[$principal_id]['unit_price'])
+                $new_details[$principal_id]['price_unit']=$item['price_unit'];
+                if(!(($new_details[$principal_id]['price_unit'])>0))
                 {
-                    $new_details[$principal_id]['currency_id']=$item['currency_id'];
-                    $new_details[$principal_id]['currency_rate']=$currency_rates[$item['currency_id']];
-                }
-                else
-                {
-                    $new_details[$principal_id]['unit_price']=0;
-                    $new_details[$principal_id]['currency_id']=0;
-                    $new_details[$principal_id]['currency_rate']=0;
+                    $new_details[$principal_id]['price_unit']=0;
                 }
 
+                $new_details[$principal_id]['quantity_total']=0;
                 for($i=1;$i<13;$i++)
                 {
                     //principal wise quantity per month
                     $new_details[$principal_id]["quantity_$i"]=$item["quantity_$i"];
-
                     //principal wise total quantity
-                    if(isset($new_details[$principal_id]["quantity_total"]))
-                    {
-                        $new_details[$principal_id]["quantity_total"]+=$item["quantity_$i"];
-                    }
-                    else
-                    {
-                        $new_details[$principal_id]["quantity_total"]=$item["quantity_$i"];
-                    }
-
+                    $new_details[$principal_id]["quantity_total"]+=$item["quantity_$i"];
                     //month wise total quantity
-                    if(isset($new_main["month_quantity_$i"]))
-                    {
-                        $new_main["month_quantity_$i"]+=$item["quantity_$i"];
-                    }
-                    else
-                    {
-                        $new_main["month_quantity_$i"]=$item["quantity_$i"];
-                    }
+                    $new_main["quantity_$i"]+=$item["quantity_$i"];
                 }
                 //confirmed total quantity
-                if(isset($new_main["confirmed_total_quantity"]))
-                {
-                    $new_main["confirmed_total_quantity"]+=$new_details[$principal_id]["quantity_total"];
-                }
-                else
-                {
-                    $new_main["confirmed_total_quantity"]=$new_details[$principal_id]["quantity_total"];
-                }
+                $new_main["quantity_confirmed_total"]+=$new_details[$principal_id]["quantity_total"];
 
                 //cogs
-                if($new_details[$principal_id]['unit_price']>0 && $new_details[$principal_id]['currency_rate']>0)
+                if($new_details[$principal_id]['price_unit']>0 && $new_details[$principal_id]['amount_rate_budget']>0)
                 {
-                    $new_details[$principal_id]['cogs']=($new_details[$principal_id]['unit_price']*$new_details[$principal_id]['currency_rate'])+(($new_details[$principal_id]['unit_price']*$new_details[$principal_id]['currency_rate'])*($direct_costs['direct_cost_total']/100))+$packs['pack_total'];
+                    $new_details[$principal_id]['cogs_kg']=($new_details[$principal_id]['price_unit']*$new_details[$principal_id]['amount_rate_budget'])+(($new_details[$principal_id]['price_unit']*$new_details[$principal_id]['amount_rate_budget'])*($direct_costs['direct_cost_percentage_total']/100))+$packs['pack_total_kg'];
                 }
                 else
                 {
-                    $new_details[$principal_id]['cogs']=0;
+                    $new_details[$principal_id]['cogs_kg']=0;
                 }
 
                 //total cogs
                 if($new_details[$principal_id]["quantity_total"]>0)
                 {
-                    $new_details[$principal_id]['total_cogs']=($new_details[$principal_id]["quantity_total"]*$new_details[$principal_id]['cogs']);
+                    $new_details[$principal_id]['cogs_total']=($new_details[$principal_id]["quantity_total"]*$new_details[$principal_id]['cogs_kg']);
                 }
                 else
                 {
-                    $new_details[$principal_id]['total_cogs']=0;
+                    $new_details[$principal_id]['cogs_total']=0;
                 }
-
-                if(isset($new_main['variety_total_cogs']))
-                {
-                    $new_main['variety_total_cogs']+=$new_details[$principal_id]["total_cogs"];
-                }
-                else
-                {
-                    $new_main['variety_total_cogs']=$new_details[$principal_id]["total_cogs"];
-                }
+                $new_main['cogs_total']+=$new_details[$principal_id]["cogs_total"];
             }
 
             $this->db->trans_start();  //DB Transaction Handle START

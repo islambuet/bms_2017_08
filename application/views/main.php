@@ -41,12 +41,6 @@ foreach($results as $result)
 {
     $system_outlets[$result['district_id']][]=$result;
 }
-$results=Query_helper::get_info($this->config->item('table_bms_setup_currency'),array('id value','name text','amount_rate_budget'),array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC'));
-$system_currencies=array();
-foreach($results as $result)
-{
-    $system_currencies[$result['value']]=$result['amount_rate_budget'];
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -115,7 +109,6 @@ foreach($results as $result)
             var system_territories=JSON.parse('<?php echo json_encode($system_territories);?>');
             var system_districts=JSON.parse('<?php echo json_encode($system_districts);?>');
             var system_outlets=JSON.parse('<?php echo json_encode($system_outlets);?>');
-            var system_currencies=JSON.parse('<?php echo json_encode($system_currencies);?>');
         </script>
         <header class="hidden-print">
 
