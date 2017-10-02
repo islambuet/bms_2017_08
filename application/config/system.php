@@ -11,7 +11,8 @@ $config['system_status_no']='No';
 $config['system_status_active']='Active';
 $config['system_status_inactive']='In-Active';
 $config['system_status_delete']='Deleted';
-$config['system_image_base_url']='http://localhost/bms_2018_08/images/';//depended on sites base url
+
+$config['system_base_url_profile_picture']='http://50.116.76.180/login/';
 
 $config['system_customer_type_outlet_id']=1;//depended on sites base url
 $config['num_year_budget_prediction']=3;//number of year predict budget
