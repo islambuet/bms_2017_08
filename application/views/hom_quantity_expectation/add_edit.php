@@ -203,6 +203,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 source: dataAdapter,
                 columnsresize: true,
                 columnsreorder: true,
+                enablebrowserselection: true,
                 altrows: true,
                 rowsheight: 35,
                 editable:true,
