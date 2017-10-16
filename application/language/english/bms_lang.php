@@ -218,3 +218,12 @@ $lang['LABEL_TI_TARGET']='TI Target';
 
 //Quantity Confirmed warning
 $lang['MSG_QC_EDIT_WARNING'] = 'If currency price, packing or direct cost changed, please save this budget again to get lastest COGS and Total COGS.';
+
+//LC
+$lang['LABEL_MONTH'] = 'Month';
+$lang['LABEL_CONSIGNMENT_NAME']='Consignment name';
+$lang['LABEL_CURRENCY_NAME']='Currency';
+$lang['LABEL_LC_NUMBER']='LC Number';
+$lang['LABEL_DATE_EXPECTED']='Expected Date';
+$lang['LABEL_QUANTITY_KG_PACK']='Quantity (packet / Kg)';
+$lang['LABEL_PACK_SIZE']='Pack Size';

@@ -35,6 +35,10 @@ $config['table_bms_setup_bud_stock_minimum'] = 'arm_bms_2017_08.bms_setup_bud_st
 $config['table_bms_mgt_quantity_confirm'] = 'arm_bms_2017_08.bms_mgt_quantity_confirm';
 $config['table_bms_mgt_quantity_confirm_details'] = 'arm_bms_2017_08.bms_mgt_quantity_confirm_details';
 
+//Purchase
+$config['table_bms_purchase_lc'] = 'arm_bms_2017_08.bms_purchase_lc';
+$config['table_bms_purchase_lc_details'] = 'arm_bms_2017_08.bms_purchase_lc_details';
+
 //packing item
 $config['table_bms_setup_packing_items'] = 'arm_bms_2017_08.bms_setup_packing_items';
 $config['table_bms_setup_packing_items_cost'] = 'arm_bms_2017_08.bms_setup_packing_items_cost';
