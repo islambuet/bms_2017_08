@@ -81,6 +81,7 @@ class Purchase_lc extends Root_Controller
             $item['principal_name']=$result['principal_name'];
             $item['lc_number']=$result['lc_number'];
             $item['status']=$result['status'];
+            $item['status_received']=$result['status_received'];
             $item['consignment_name']=$result['consignment_name'];
             $item['month_name']=$this->lang->line("LABEL_MONTH_$result[month_id]");
             $item['date_opening']=System_helper::display_date($result['date_opening']);
@@ -156,6 +157,15 @@ class Purchase_lc extends Root_Controller
                 $ajax['status']=false;
                 $ajax['system_message']='Invalid Try';
                 $this->json_return($ajax);
+            }
+            if($data['item']['status_received']==$this->config->item('system_status_yes'))
+            {
+                if(!(isset($this->permissions['action3'])&&($this->permissions['action3']==1)))
+                {
+                    $ajax['status']=false;
+                    $ajax['system_message']='Already product received, you can not edit this LC';
+                    $this->json_return($ajax);
+                }
             }
 
             $data['items']=Query_helper::get_info($this->config->item('table_bms_purchase_lc_details'),'*',array('lc_id='.$item_id,'revision=1'));
@@ -262,7 +272,7 @@ class Purchase_lc extends Root_Controller
                 {
                     $currency_rate=$result['amount_currency_rate'];
                 }
-                if($result && $result['revision_receive']>0)
+                if($result && $result['status_received']==$this->config->item('system_status_yes'))
                 {
                     if(isset($this->permissions['action3'])&&($this->permissions['action3']==1))
                     {

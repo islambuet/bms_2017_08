@@ -91,7 +91,8 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 { name: 'consignment_name', type: 'string' },
                 { name: 'lc_number', type: 'string' },
                 { name: 'date_expected', type: 'string' },
-                { name: 'status', type: 'string' }
+                { name: 'status', type: 'string' },
+                { name: 'status_received', type: 'string' }
             ],
             id: 'id',
             url: url
@@ -123,7 +124,8 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                     { text: '<?php echo $CI->lang->line('LABEL_MONTH'); ?>', dataField: 'month_name',filtertype: 'list'},
                     { text: '<?php echo $CI->lang->line('LABEL_DATE_OPENING'); ?>', dataField: 'date_opening'},
                     { text: '<?php echo $CI->lang->line('LABEL_DATE_EXPECTED'); ?>', dataField: 'date_expected'},
-                    { text: '<?php echo $CI->lang->line('STATUS'); ?>', dataField: 'status',cellsalign: 'right',filtertype: 'list'}
+                    { text: '<?php echo $CI->lang->line('STATUS'); ?>', dataField: 'status',cellsalign: 'right',filtertype: 'list'},
+                    { text: 'Receive Status', dataField: 'status_received',cellsalign: 'right',filtertype: 'list'}
                 ]
             });
     });
