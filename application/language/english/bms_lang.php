@@ -227,3 +227,5 @@ $lang['LABEL_LC_NUMBER']='LC Number';
 $lang['LABEL_DATE_EXPECTED']='Expected Date';
 $lang['LABEL_QUANTITY_KG_PACK']='Quantity (packet / Kg)';
 $lang['LABEL_PACK_SIZE']='Pack Size';
+$lang['LABEL_RECEIVED_STATUS']='Received Status';
+$lang['LABEL_CLOSED_STATUS']='Closed Status';
