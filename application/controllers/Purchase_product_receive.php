@@ -117,9 +117,12 @@ class Purchase_product_receive extends Root_Controller
             }
             if($data['item']['status_received']==$this->config->item('system_status_yes'))
             {
-                $ajax['status']=false;
-                $ajax['system_message']='Already product received, you can not edit this LC';
-                $this->json_return($ajax);
+                if(!(isset($this->permissions['action3'])&&($this->permissions['action3']==1)))
+                {
+                    $ajax['status']=false;
+                    $ajax['system_message']='Already product received, you can not edit this LC';
+                    $this->json_return($ajax);
+                }
             }
 
             $results=Query_helper::get_info($this->config->item('table_bms_purchase_lc_details'),'*',array('lc_id='.$item_id,'revision=1'));
