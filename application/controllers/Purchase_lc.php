@@ -293,7 +293,7 @@ class Purchase_lc extends Root_Controller
                             $v_data['quantity_type_id']=$v['quantity_type_id'];
                             $v_data['quantity_order']=$v['quantity_order'];
                             $v_data['amount_price_order']=$v['amount_price_order'];
-                            $v_data['amount_price_total_order']=$v['quantity_order']*$v['amount_price_order']*$currency_rate;
+                            $v_data['amount_price_total_order']=$v['quantity_order']*$v['amount_price_order']*$data['amount_currency_rate'];
                             $v_data['revision']=1;
                             $v_data['date_created'] = $time;
                             $v_data['user_created'] = $user->user_id;
@@ -367,7 +367,7 @@ class Purchase_lc extends Root_Controller
                             $v_data['quantity_type_id']=$v['quantity_type_id'];
                             $v_data['quantity_order']=$v['quantity_order'];
                             $v_data['amount_price_order']=$v['amount_price_order'];
-                            $v_data['amount_price_total_order']=$v['quantity_order']*$v['amount_price_order']*$currency_rate;
+                            $v_data['amount_price_total_order']=$v['quantity_order']*$v['amount_price_order']*$data['amount_currency_rate'];
                             $v_data['revision']=1;
                             $v_data['date_created'] = $time;
                             $v_data['user_created'] = $user->user_id;
