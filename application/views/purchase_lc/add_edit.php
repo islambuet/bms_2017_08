@@ -240,7 +240,7 @@ if(!(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1)) && 
                                     else
                                     {
                                         ?>
-                                        <select class="form-control variety">
+                                        <select name="varieties[<?php echo $index+1;?>][variety_id]" class="form-control variety">
                                             <option value=""><?php echo $CI->lang->line('SELECT'); ?></option>
                                             <?php
                                                 foreach($varieties as $variety)
@@ -267,14 +267,14 @@ if(!(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1)) && 
                                     else
                                     {
                                         ?>
-                                        <select class="form-control quantity_type">
+                                        <select name="varieties[<?php echo $index+1;?>][quantity_type_id]" class="form-control quantity_type">
                                             <option value="-1"><?php echo $this->lang->line('SELECT'); ?></option>
-                                            <option value="0"<?php if($value['quantity_type_id']==0){echo ' selected';} ?>>Bulk</option>
+                                            <option value="0"<?php if($value['quantity_type_id']==0){echo 'selected';} ?>>Bulk</option>
                                             <?php
                                                 foreach($packs as $pack)
                                                 {
                                                     ?>
-                                                    <option value="<?php echo $pack['value']?>"<?php if($value['quantity_type_id']==$pack['value']){echo ' selected';} ?>><?php echo $pack['text'];?></option>
+                                                    <option value="<?php echo $pack['value']?>"<?php if($value['quantity_type_id']==$pack['value']){echo 'selected';} ?>><?php echo $pack['text'];?></option>
                                                     <?php
                                                 }
                                             ?>
@@ -306,7 +306,7 @@ if(!(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1)) && 
                                     {
                                         ?>
                                         <label><?php echo $value['amount_price_order']; ?></label>
-                                        <input type="hidden" value="<?php echo number_format($value['amount_price_order'],2); ?>" name="varieties[<?php echo $index+1;?>][amount_price_order]">
+                                        <input type="hidden" value="<?php echo $value['amount_price_order']; ?>" name="varieties[<?php echo $index+1;?>][amount_price_order]">
                                         <?php
                                     }
                                     else

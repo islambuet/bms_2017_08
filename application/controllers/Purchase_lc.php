@@ -151,6 +151,12 @@ class Purchase_lc extends Root_Controller
             }
 
             $data['item']=Query_helper::get_info($this->config->item('table_bms_purchase_lc'),'*',array('id ='.$item_id),1);
+            if(!$data['item'])
+            {
+                $ajax['status']=false;
+                $ajax['system_message']='Invalid Try';
+                $this->json_return($ajax);
+            }
 
             $data['items']=Query_helper::get_info($this->config->item('table_bms_purchase_lc_details'),'*',array('lc_id='.$item_id,'revision=1'));
 
@@ -207,52 +213,203 @@ class Purchase_lc extends Root_Controller
     {
         $id = $this->input->post("id");
         $user = User_helper::get_user();
-        if($id>0)
-        {
-            if(!(isset($this->permissions['action2'])&&($this->permissions['action2']==1)))
-            {
-                $ajax['status']=false;
-                $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
-                $this->json_return($ajax);
-                die();
-            }
-        }
-        else
-        {
-            if(!(isset($this->permissions['action1'])&&($this->permissions['action1']==1)))
-            {
-                $ajax['status']=false;
-                $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
-                $this->json_return($ajax);
-                die();
-            }
-        }
-        if(!$this->check_validation())
+        if(!(isset($this->permissions['action1'])&&($this->permissions['action1']==1) || isset($this->permissions['action2'])&&($this->permissions['action2']==1) || isset($this->permissions['action3'])&&($this->permissions['action3']==1)))
         {
             $ajax['status']=false;
-            $ajax['system_message']=$this->message;
+            $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
             $this->json_return($ajax);
+            die();
         }
         else
         {
             $time=time();
             $data=$this->input->post('item');
-            $data['date_opening']=System_helper::get_time($data['date_opening']);
-            $data['date_expected']=System_helper::get_time($data['date_expected']);
-            //print_r($data);exit;
+            if($data)
+            {
+                $data['date_opening']=System_helper::get_time($data['date_opening']);
+                $data['date_expected']=System_helper::get_time($data['date_expected']);
+            }
+            $varieties=$this->input->post('varieties');
+            if($varieties)
+            {
+                if(!$this->check_validation_for_varieties())
+                {
+                    $ajax['status']=false;
+                    $ajax['system_message']=$this->message;
+                    $this->json_return($ajax);
+                    die();
+                }
+            }
             $this->db->trans_start();  //DB Transaction Handle START
+
             if($id>0)
             {
-                $data['date_updated']=$time;
-                $data['user_updated']=$user->user_id;
-                Query_helper::update($this->config->item('table_bms_purchase_lc'),$data,array('id='.$id));
+                $this->db->from($this->config->item('table_bms_purchase_lc').' lc');
+                $this->db->select('lc.*');
+                $this->db->select('lc_details.*');
+                $this->db->join($this->config->item('table_bms_purchase_lc_details').' lc_details','lc_details.lc_id = lc.id AND lc_details.revision = 1','LEFT');
+                $this->db->where('lc.id',$id);
+                $this->db->where('lc.status',$this->config->item('system_status_active'));
+                $result=$this->db->get()->row_array();
+                if(!$result)
+                {
+                    $ajax['status']=false;
+                    $ajax['system_message']='Invalid Try';
+                    $this->json_return($ajax);
+                    die();
+                }
+                else
+                {
+                    $currency_rate=$result['amount_currency_rate'];
+                }
+                if($result && $result['revision_receive']>0)
+                {
+                    if(isset($this->permissions['action3'])&&($this->permissions['action3']==1))
+                    {
+                        if(!$this->check_validation())
+                        {
+                            $ajax['status']=false;
+                            $ajax['system_message']=$this->message;
+                            $this->json_return($ajax);
+                        }
+                        $data['date_updated']=$time;
+                        $data['user_updated']=$user->user_id;
+                        Query_helper::update($this->config->item('table_bms_purchase_lc'),$data,array('id='.$id));
+                        //varieties
+                        $revision_history_data=array();
+                        $revision_history_data['date_updated']=$time;
+                        $revision_history_data['user_updated']=$user->user_id;
+                        Query_helper::update($this->config->item('table_bms_purchase_lc_details'),$revision_history_data,array('revision=1','lc_id='.$id));
+
+                        $this->db->where('lc_id',$id);
+                        $this->db->set('revision', 'revision+1', FALSE);
+                        $this->db->update($this->config->item('table_bms_purchase_lc_details'));
+
+                        foreach($varieties as $v)
+                        {
+                            $v_data=array();
+                            $v_data['lc_id']=$id;
+                            $v_data['variety_id']=$v['variety_id'];
+                            $v_data['quantity_type_id']=$v['quantity_type_id'];
+                            $v_data['quantity_order']=$v['quantity_order'];
+                            $v_data['amount_price_order']=$v['amount_price_order'];
+                            $v_data['amount_price_total_order']=$v['quantity_order']*$v['amount_price_order']*$currency_rate;
+                            $v_data['revision']=1;
+                            $v_data['date_created'] = $time;
+                            $v_data['user_created'] = $user->user_id;
+                            Query_helper::add($this->config->item('table_bms_purchase_lc_details'),$v_data);
+                        }
+                    }
+                    else
+                    {
+                        $ajax['status']=false;
+                        $ajax['system_message']='You can not edit this LC';
+                        $this->json_return($ajax);
+                        die();
+                    }
+                }
+                else
+                {
+                    if(!(isset($this->permissions['action2']) && ($this->permissions['action2']==1)) && !(isset($this->permissions['action3']) && ($this->permissions['action3']==1)) && isset($this->permissions['action1']) && ($this->permissions['action1']==1))
+                    {
+                        //varieties
+                        $revision_history_data=array();
+                        $revision_history_data['date_updated']=$time;
+                        $revision_history_data['user_updated']=$user->user_id;
+                        Query_helper::update($this->config->item('table_bms_purchase_lc_details'),$revision_history_data,array('revision=1','lc_id='.$id));
+
+                        $this->db->where('lc_id',$id);
+                        $this->db->set('revision', 'revision+1', FALSE);
+                        $this->db->update($this->config->item('table_bms_purchase_lc_details'));
+
+                        foreach($varieties as $v)
+                        {
+                            $v_data=array();
+                            $v_data['lc_id']=$id;
+                            $v_data['variety_id']=$v['variety_id'];
+                            $v_data['quantity_type_id']=$v['quantity_type_id'];
+                            $v_data['quantity_order']=$v['quantity_order'];
+                            $v_data['amount_price_order']=$v['amount_price_order'];
+                            $v_data['amount_price_total_order']=$v['quantity_order']*$v['amount_price_order']*$currency_rate;
+                            $v_data['revision']=1;
+                            $v_data['date_created'] = $time;
+                            $v_data['user_created'] = $user->user_id;
+                            Query_helper::add($this->config->item('table_bms_purchase_lc_details'),$v_data);
+                        }
+                    }
+                    if(isset($this->permissions['action2'])&&($this->permissions['action2']==1) || isset($this->permissions['action3'])&&($this->permissions['action3']==1))
+                    {
+                        if(!$this->check_validation())
+                        {
+                            $ajax['status']=false;
+                            $ajax['system_message']=$this->message;
+                            $this->json_return($ajax);
+                            die();
+                        }
+                        $data['date_updated']=$time;
+                        $data['user_updated']=$user->user_id;
+                        Query_helper::update($this->config->item('table_bms_purchase_lc'),$data,array('id='.$id));
+                        //varieties
+                        $revision_history_data=array();
+                        $revision_history_data['date_updated']=$time;
+                        $revision_history_data['user_updated']=$user->user_id;
+                        Query_helper::update($this->config->item('table_bms_purchase_lc_details'),$revision_history_data,array('revision=1','lc_id='.$id));
+
+                        $this->db->where('lc_id',$id);
+                        $this->db->set('revision', 'revision+1', FALSE);
+                        $this->db->update($this->config->item('table_bms_purchase_lc_details'));
+
+                        foreach($varieties as $v)
+                        {
+                            $v_data=array();
+                            $v_data['lc_id']=$id;
+                            $v_data['variety_id']=$v['variety_id'];
+                            $v_data['quantity_type_id']=$v['quantity_type_id'];
+                            $v_data['quantity_order']=$v['quantity_order'];
+                            $v_data['amount_price_order']=$v['amount_price_order'];
+                            $v_data['amount_price_total_order']=$v['quantity_order']*$v['amount_price_order']*$currency_rate;
+                            $v_data['revision']=1;
+                            $v_data['date_created'] = $time;
+                            $v_data['user_created'] = $user->user_id;
+                            Query_helper::add($this->config->item('table_bms_purchase_lc_details'),$v_data);
+                        }
+                    }
+                }
             }
             else
             {
-                $data['user_created'] = $user->user_id;
-                $data['date_created'] = time();
-                Query_helper::add($this->config->item('table_bms_purchase_lc'),$data);
+                if(!$this->check_validation())
+                {
+                    $ajax['status']=false;
+                    $ajax['system_message']=$this->message;
+                    $this->json_return($ajax);
+                }
+                if(isset($this->permissions['action1'])&&($this->permissions['action1']==1))
+                {
+                    $data['user_created'] = $user->user_id;
+                    $data['date_created'] = time();
+                    $lc_id=Query_helper::add($this->config->item('table_bms_purchase_lc'),$data);
+                    //varieties
+                    if($varieties)
+                    {
+                        foreach($varieties as $v)
+                        {
+                            $v_data=array();
+                            $v_data['lc_id']=$lc_id;
+                            $v_data['variety_id']=$v['variety_id'];
+                            $v_data['quantity_type_id']=$v['quantity_type_id'];
+                            $v_data['quantity_order']=$v['quantity_order'];
+                            $v_data['amount_price_order']=$v['amount_price_order'];
+                            $v_data['amount_price_total_order']=$v['quantity_order']*$v['amount_price_order']*$data['amount_currency_rate'];
+                            $v_data['revision']=1;
+                            $v_data['date_created'] = $time;
+                            $v_data['user_created'] = $user->user_id;
+                            Query_helper::add($this->config->item('table_bms_purchase_lc_details'),$v_data);
+                        }
+                    }
+                }
             }
+
             $this->db->trans_complete();   //DB Transaction Handle END
             if ($this->db->trans_status() === TRUE)
             {
@@ -292,6 +449,26 @@ class Purchase_lc extends Root_Controller
         {
             $this->message=validation_errors();
             return false;
+        }
+        return true;
+    }
+    private function check_validation_for_varieties()
+    {
+        $varieties=$this->input->post('varieties');
+        if(!(sizeof($varieties)>0))
+        {
+            return true;
+        }
+        else
+        {
+            foreach($varieties as $variety)
+            {
+                if(!(($variety['variety_id']>0)&& ($variety['quantity_type_id']>=0)&& ($variety['quantity_order']>0)&& ($variety['amount_price_order']>0)))
+                {
+                    $this->message='Unfinished Variety Entry';
+                    return false;
+                }
+            }
         }
         return true;
     }
