@@ -6,7 +6,23 @@ $action_buttons[]=array(
     'label'=>$CI->lang->line("ACTION_BACK"),
     'href'=>site_url($CI->controller_url)
 );
-if(isset($CI->permissions['action1']) && ($CI->permissions['action1']==1))
+$show_save_button=false;
+if($item['revision_received']>0)
+{
+    if(isset($CI->permissions['action3']) && ($CI->permissions['action3']==1))
+    {
+        $show_save_button=true;
+    }
+    elseif(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1) && $item['revision_cost']>=0 && $item['status_closed']==$CI->config->item('system_status_no'))
+    {
+        $show_save_button=true;
+    }
+    elseif(isset($CI->permissions['action1']) && ($CI->permissions['action1']==1) && $item['revision_cost']==0 && $item['status_closed']==$CI->config->item('system_status_no'))
+    {
+        $show_save_button=true;
+    }
+}
+if($show_save_button)
 {
     $action_buttons[]=array(
         'type'=>'button',
@@ -14,9 +30,6 @@ if(isset($CI->permissions['action1']) && ($CI->permissions['action1']==1))
         'id'=>'button_action_save',
         'data-form'=>'#save_form'
     );
-}
-if(isset($CI->permissions['action1']) && ($CI->permissions['action1']==1))
-{
     $action_buttons[]=array(
         'type'=>'button',
         'label'=>$CI->lang->line("ACTION_CLEAR"),
@@ -25,11 +38,6 @@ if(isset($CI->permissions['action1']) && ($CI->permissions['action1']==1))
     );
 }
 $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
-echo '<pre>';
-print_r($item);
-print_r($items_variety_cost);
-print_r($items_direct_cost);
-echo '</pre>';
 ?>
 <form id="save_form" action="<?php echo site_url($CI->controller_url.'/index/save');?>" method="post">
     <input type="hidden" id="id" name="id" value="<?php echo $item['id']; ?>" />
@@ -168,7 +176,20 @@ echo '</pre>';
                             <label for="direct_cost_<?php echo $direct_cost['id']; ?>" class="control-label pull-right"><?php echo $direct_cost['name']; ?><span style="color:#FF0000">*</span></label>
                         </div>
                         <div class="col-sm-4 col-xs-8">
-                            <input type="text" id="direct_cost_<?php echo $direct_cost['id']; ?>" name="direct_cost[<?php echo $direct_cost['id']; ?>]" class="form-control" value="<?php echo $direct_cost['amount_cost']; ?>">
+                            <?php
+                            if($show_save_button)
+                            {
+                                ?>
+                                <input type="text" id="direct_cost_<?php echo $direct_cost['id']; ?>" name="direct_cost[<?php echo $direct_cost['id']; ?>]" class="form-control float_type_positive" value="<?php echo $direct_cost['amount_cost']; ?>">
+                                <?php
+                            }
+                            else
+                            {
+                                ?>
+                                <label>N/A</label>
+                                <?php
+                            }
+                            ?>
                         </div>
                     </div>
                     <?php
@@ -201,105 +222,59 @@ echo '</pre>';
                             ?>
                             <tr>
                                 <td>
+                                    <label><?php echo $variety_cost['variety_name']; ?></label>
+                                </td>
+                                <td>
                                     <?php
-                                    if(!(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1)))
+                                    if($variety_cost['quantity_type_id']>0)
                                     {
                                         ?>
-                                        <label><?php echo $varieties[$value['variety_id']]['text']; ?></label>
-                                        <input type="hidden" name="varieties[<?php echo $index+1;?>][variety_id]" value="<?php echo $value['variety_id']; ?>">
+                                        <label><?php echo $variety_cost['pack_name']; ?></label>
                                         <?php
                                     }
                                     else
                                     {
                                         ?>
-                                        <select name="varieties[<?php echo $index+1;?>][variety_id]" class="form-control variety">
-                                            <option value=""><?php echo $CI->lang->line('SELECT'); ?></option>
-                                            <?php
-                                                foreach($varieties as $variety)
-                                                {
-                                                    ?>
-                                                    <option value="<?php echo $variety['value']; ?>"<?php if($variety['value']==$value['variety_id']){echo ' selected';} ?>><?php echo $variety['text']; ?></option>
-                                                    <?php
-                                                }
-                                            ?>
-                                        </select>
+                                        <label>Bulk</label>
+                                        <?php
+                                    }
+                                    ?>
+                                </td>
+                                <td>
+                                    <label><?php echo $variety_cost['quantity_order']; ?></label>
+                                </td>
+                                <td>
+                                    <?php
+                                    if($item['revision_received']==0)
+                                    {
+                                        ?>
+                                        <label>Not Received</label>
+                                        <?php
+                                    }
+                                    else
+                                    {
+                                        ?>
+                                        <label><?php echo $variety_cost['quantity_actual']; ?></label>
                                         <?php
                                     }
                                     ?>
                                 </td>
                                 <td>
                                     <?php
-                                    if(!(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1)))
+                                    if($show_save_button)
                                     {
                                         ?>
-                                        <label><?php if($value['quantity_type_id']==0){echo 'Bulk';}else{echo $packs[$value['quantity_type_id']]['text'];} ?></label>
-                                        <input type="hidden" name="varieties[<?php echo $index+1;?>][quantity_type_id]" value="<?php echo $value['quantity_type_id']; ?>">
+                                        <input type="text" class="form-control float_type_positive" name="items[<?php echo $index; ?>][amount_price_total_actual]" value="<?php echo $variety_cost['amount_price_total_actual']; ?>">
+                                        <input type="hidden" name="items[<?php echo $index; ?>][variety_id]" value="<?php echo $variety_cost['variety_id']; ?>">
+                                        <input type="hidden" name="items[<?php echo $index; ?>][quantity_type_id]" value="<?php echo $variety_cost['quantity_type_id']; ?>">
                                         <?php
                                     }
                                     else
                                     {
                                         ?>
-                                        <select name="varieties[<?php echo $index+1;?>][quantity_type_id]" class="form-control quantity_type">
-                                            <option value="-1"><?php echo $this->lang->line('SELECT'); ?></option>
-                                            <option value="0"<?php if($value['quantity_type_id']==0){echo 'selected';} ?>>Bulk</option>
-                                            <?php
-                                                foreach($packs as $pack)
-                                                {
-                                                    ?>
-                                                    <option value="<?php echo $pack['value']?>"<?php if($value['quantity_type_id']==$pack['value']){echo 'selected';} ?>><?php echo $pack['text'];?></option>
-                                                    <?php
-                                                }
-                                            ?>
-                                        </select>
+                                        <label>N/A</label>
                                         <?php
                                     }
-                                    ?>
-                                </td>
-                                <td>
-                                    <?php
-                                    if(!(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1)))
-                                    {
-                                        ?>
-                                        <label><?php if($value['quantity_type_id']==0){echo number_format($value['quantity_order'],3);}else{echo $value['quantity_order'];}  ?></label>
-                                        <input type="hidden" value="<?php echo $value['quantity_order']; ?>" name="varieties[<?php echo $index+1;?>][quantity_order]">
-                                        <?php
-                                    }
-                                    else
-                                    {
-                                        ?>
-                                        <input type="text" value="<?php echo $value['quantity_order']; ?>" class="form-control float_type_positive quantity" id="quantity_id_<?php echo $index+1;?>" data-current-id="<?php echo $index+1;?>" name="varieties[<?php echo $index+1;?>][quantity_order]">
-                                        <?php
-                                    }
-                                    ?>
-                                </td>
-                                <td>
-                                    <?php
-                                    if(!(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1)))
-                                    {
-                                        ?>
-                                        <label><?php echo $value['amount_price_order']; ?></label>
-                                        <input type="hidden" value="<?php echo $value['amount_price_order']; ?>" name="varieties[<?php echo $index+1;?>][amount_price_order]">
-                                        <?php
-                                    }
-                                    else
-                                    {
-                                        ?>
-                                        <input type="text" value="<?php echo $value['amount_price_order']; ?>" class="form-control float_type_positive price" id="price_id_<?php echo $index+1;?>" data-current-id="<?php echo $index+1;?>" name="varieties[<?php echo $index+1;?>][amount_price_order]">
-                                        <?php
-                                    }
-                                    ?>
-                                </td>
-                                <td class="text-right">
-                                    <label class="control-label total_price" id="total_price_id_<?php echo $index+1;?>" data-current-id="<?php echo $index+1;?>"><?php echo number_format($value['amount_price_total_order'],2); ?></label>
-                                </td>
-                                <td>
-                                    <?php
-                                        if(isset($CI->permissions['action3']) && ($CI->permissions['action3']==1))
-                                        {
-                                            ?>
-                                            <button class="btn btn-danger system_button_add_delete" type="button"><?php echo $CI->lang->line('DELETE'); ?></button>
-                                            <?php
-                                        }
                                     ?>
                                 </td>
                             </tr>
@@ -310,6 +285,38 @@ echo '</pre>';
                 </table>
             </div>
         </div>
+        <?php
+        if($show_save_button)
+        {
+            ?>
+            <div class="row show-grid">
+                <div class="col-xs-4">
+                    <label class="control-label pull-right">Closed Status</label>
+                </div>
+                <div class="col-sm-2 col-xs-8">
+                    <select id="status_closed" name="item[status_closed]" class="form-control">
+                        <option value="<?php echo $CI->config->item('system_status_no'); ?>"
+                            <?php
+                            if ($item['status_closed']==$CI->config->item('system_status_no'))
+                            {
+                                echo ' selected';
+                            }
+                            ?>>Open
+                        </option>
+                        <option value="<?php echo $CI->config->item('system_status_yes'); ?>"
+                            <?php
+                            if ($item['status_closed']==$CI->config->item('system_status_yes'))
+                            {
+                                echo ' selected';
+                            }
+                            ?>>Closed
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <?php
+        }
+        ?>
     </div>
     <div class="clearfix"></div>
 </form>

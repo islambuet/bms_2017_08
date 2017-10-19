@@ -378,7 +378,7 @@ $config['encryption_key'] = '';
 |
 */
 $config['sess_driver'] = 'database';
-$config['sess_cookie_name'] = 'bms_2017_07';
+$config['sess_cookie_name'] = 'bms_2017_08';
 $config['sess_expiration'] = 7200;
 $config['sess_save_path'] = 'arm_bms_2017_08.system_session';
 $config['sess_match_ip'] = FALSE;
