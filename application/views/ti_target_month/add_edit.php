@@ -326,8 +326,13 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                             $current_month=$starting_month+$i;
                         }
                         $month_name=$this->lang->line('LABEL_MONTH_'.$current_month);
+                        if(sizeof($years_previous)>0)
+                        {
+                            ?>
+                            { parentgroup: 'month<?php echo $current_month; ?>',text: 'Prev. Yr. Achieved', align: 'center', name: 'previous_year_month<?php echo $current_month; ?>' },
+                            <?php
+                        }
                         ?>
-                        { parentgroup: 'month<?php echo $current_month; ?>',text: 'Prev. Yr. Achieved', align: 'center', name: 'previous_year_month<?php echo $current_month; ?>' },
                         { text: '<?php echo $month_name; ?>', align: 'center', name: 'month<?php echo $current_month; ?>' },
                         <?php
                     }
