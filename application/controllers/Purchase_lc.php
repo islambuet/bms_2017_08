@@ -169,6 +169,7 @@ class Purchase_lc extends Root_Controller
             }
 
             $data['items']=Query_helper::get_info($this->config->item('table_bms_purchase_lc_details'),'*',array('lc_id='.$item_id,'revision=1'));
+            //print_r($data['items']);exit;
 
             $data['fiscal_years']=Query_helper::get_info($this->config->item('table_login_basic_setup_fiscal_year'),array('id value','name text','date_start','date_end'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('id ASC'));
 
@@ -323,6 +324,7 @@ class Purchase_lc extends Root_Controller
                     if(!(isset($this->permissions['action2']) && ($this->permissions['action2']==1)) && !(isset($this->permissions['action3']) && ($this->permissions['action3']==1)) && isset($this->permissions['action1']) && ($this->permissions['action1']==1))
                     {
                         //varieties
+
                         $revision_history_data=array();
                         $revision_history_data['date_updated']=$time;
                         $revision_history_data['user_updated']=$user->user_id;
@@ -331,20 +333,22 @@ class Purchase_lc extends Root_Controller
                         $this->db->where('lc_id',$id);
                         $this->db->set('revision', 'revision+1', FALSE);
                         $this->db->update($this->config->item('table_bms_purchase_lc_details'));
-
-                        foreach($varieties as $v)
+                        if($varieties)
                         {
-                            $v_data=array();
-                            $v_data['lc_id']=$id;
-                            $v_data['variety_id']=$v['variety_id'];
-                            $v_data['quantity_type_id']=$v['quantity_type_id'];
-                            $v_data['quantity_order']=$v['quantity_order'];
-                            $v_data['amount_price_order']=$v['amount_price_order'];
-                            $v_data['amount_price_total_order']=$v['quantity_order']*$v['amount_price_order']*$currency_rate;
-                            $v_data['revision']=1;
-                            $v_data['date_created'] = $time;
-                            $v_data['user_created'] = $user->user_id;
-                            Query_helper::add($this->config->item('table_bms_purchase_lc_details'),$v_data);
+                            foreach($varieties as $v)
+                            {
+                                $v_data=array();
+                                $v_data['lc_id']=$id;
+                                $v_data['variety_id']=$v['variety_id'];
+                                $v_data['quantity_type_id']=$v['quantity_type_id'];
+                                $v_data['quantity_order']=$v['quantity_order'];
+                                $v_data['amount_price_order']=$v['amount_price_order'];
+                                $v_data['amount_price_total_order']=$v['quantity_order']*$v['amount_price_order']*$currency_rate;
+                                $v_data['revision']=1;
+                                $v_data['date_created'] = $time;
+                                $v_data['user_created'] = $user->user_id;
+                                Query_helper::add($this->config->item('table_bms_purchase_lc_details'),$v_data);
+                            }
                         }
                     }
                     if(isset($this->permissions['action2'])&&($this->permissions['action2']==1) || isset($this->permissions['action3'])&&($this->permissions['action3']==1))
@@ -360,6 +364,7 @@ class Purchase_lc extends Root_Controller
                         $data['user_updated']=$user->user_id;
                         Query_helper::update($this->config->item('table_bms_purchase_lc'),$data,array('id='.$id));
                         //varieties
+
                         $revision_history_data=array();
                         $revision_history_data['date_updated']=$time;
                         $revision_history_data['user_updated']=$user->user_id;
@@ -368,20 +373,22 @@ class Purchase_lc extends Root_Controller
                         $this->db->where('lc_id',$id);
                         $this->db->set('revision', 'revision+1', FALSE);
                         $this->db->update($this->config->item('table_bms_purchase_lc_details'));
-
-                        foreach($varieties as $v)
+                        if($varieties)
                         {
-                            $v_data=array();
-                            $v_data['lc_id']=$id;
-                            $v_data['variety_id']=$v['variety_id'];
-                            $v_data['quantity_type_id']=$v['quantity_type_id'];
-                            $v_data['quantity_order']=$v['quantity_order'];
-                            $v_data['amount_price_order']=$v['amount_price_order'];
-                            $v_data['amount_price_total_order']=$v['quantity_order']*$v['amount_price_order']*$data['amount_currency_rate'];
-                            $v_data['revision']=1;
-                            $v_data['date_created'] = $time;
-                            $v_data['user_created'] = $user->user_id;
-                            Query_helper::add($this->config->item('table_bms_purchase_lc_details'),$v_data);
+                            foreach($varieties as $v)
+                            {
+                                $v_data=array();
+                                $v_data['lc_id']=$id;
+                                $v_data['variety_id']=$v['variety_id'];
+                                $v_data['quantity_type_id']=$v['quantity_type_id'];
+                                $v_data['quantity_order']=$v['quantity_order'];
+                                $v_data['amount_price_order']=$v['amount_price_order'];
+                                $v_data['amount_price_total_order']=$v['quantity_order']*$v['amount_price_order']*$data['amount_currency_rate'];
+                                $v_data['revision']=1;
+                                $v_data['date_created'] = $time;
+                                $v_data['user_created'] = $user->user_id;
+                                Query_helper::add($this->config->item('table_bms_purchase_lc_details'),$v_data);
+                            }
                         }
                     }
                 }
