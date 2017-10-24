@@ -10,7 +10,7 @@ abstract class Root_Controller extends CI_Controller
             $user=User_helper::get_user();
             if(!$user)
             {
-                if($this->router->class!="home")
+                if(!in_array(strtolower($this->router->class),$this->config->item('external_controllers')))
                 {
                     $this->login_page("Time out");
                 }
