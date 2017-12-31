@@ -227,7 +227,8 @@ class Sys_module_task extends Root_Controller
         $this->load->library('form_validation');
         $this->form_validation->set_rules('item[name]',$this->lang->line('LABEL_NAME'),'required');
         $this->form_validation->set_rules('item[type]',$this->lang->line('LABEL_TYPE'),'required');
-        if($this->input->post('item')['type']=='TASK')
+        $post=$this->input->post('item');
+        if($post['type']=='TASK')
         {
             $this->form_validation->set_rules('item[controller]',$this->lang->line('LABEL_CONTROLLER_NAME'),'required');
         }
